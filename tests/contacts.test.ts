@@ -313,4 +313,27 @@ describe('3. Tests Intégration & Parcours Critiques API (Critères d’acceptat
     );
     expect(deniedEntries.length).toBeGreaterThanOrEqual(2);
   });
+
+  it('Journalise les requêtes de recherche (SEARCH_CONTACTS) dans le journal d’audit pour la conformité', async () => {
+    const app = createApiApp(repo);
+
+    const searchRes = await request(app)
+      .get('/api/contacts')
+      .set('x-user-role', UserRole.EDITOR)
+      .query({ q: 'Moreau', searchMode: 'partial' });
+
+    expect(searchRes.status).toBe(200);
+    expect(searchRes.body.contacts.length).toBeGreaterThanOrEqual(1);
+
+    const auditRes = await request(app).get('/api/audit');
+    expect(auditRes.status).toBe(200);
+    const searchLog = auditRes.body.logs.find(
+      (l: { action: string; metadata?: { query?: string } }) =>
+        l.action === 'SEARCH_CONTACTS' && l.metadata?.query === 'Moreau'
+    );
+    expect(searchLog).toBeDefined();
+    expect(searchLog.actorRole).toBe(UserRole.EDITOR);
+    expect(searchLog.metadata.resultsCount).toBe(searchRes.body.contacts.length);
+  });
 });
+

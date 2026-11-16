@@ -125,6 +125,7 @@ export interface AuditLogEntry {
   timestamp: string;
   actorRole: UserRole;
   action:
+    | 'SEARCH_CONTACTS'
     | 'CREATE_CONTACT'
     | 'UPDATE_CONTACT'
     | 'DELETE_CONTACT'

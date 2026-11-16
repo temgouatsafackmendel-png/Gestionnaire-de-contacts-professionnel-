@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   Building2,
@@ -22,6 +22,7 @@ import {
   Phone,
   Plus,
   RotateCcw,
+  Save,
   Search,
   Star,
   Sun,
@@ -31,8 +32,10 @@ import {
   X,
 } from 'lucide-react';
 import { AuditLogView } from './components/AuditLogView';
+import { CategoryDonutChart } from './components/CategoryDonutChart';
 import { ContactFormModal } from './components/ContactFormModal';
 import { DuplicatesView } from './components/DuplicatesView';
+import { DirectoryEmptyState } from './components/EmptyStateIllustration';
 import { ImportExportView } from './components/ImportExportView';
 import { apiClient, generateVCard, triggerBrowserDownload } from './services/apiClient';
 import { serializeContactsToCsv } from './shared/csv';
@@ -50,7 +53,7 @@ import {
 } from './shared/types';
 
 type ActiveTab = 'directory' | 'duplicates' | 'import_export' | 'audit';
-type DirectoryViewMode = 'table' | 'grid';
+type DirectoryViewMode = 'table' | 'grid' | 'companies';
 
 const CATEGORY_LABELS: Record<string, string> = {
   all: 'Tous',
@@ -60,6 +63,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   [ContactCategory.PROSPECT]: 'Prospects',
   [ContactCategory.INTERNE]: 'Internes',
   [ContactCategory.AUTRE]: 'Autres',
+};
+
+const CATEGORY_BAR_COLORS: Record<string, string> = {
+  [ContactCategory.CLIENT]: 'bg-emerald-600 dark:bg-emerald-500',
+  [ContactCategory.PARTENAIRE]: 'bg-sky-600 dark:bg-sky-500',
+  [ContactCategory.FOURNISSEUR]: 'bg-amber-500 dark:bg-amber-400',
+  [ContactCategory.PROSPECT]: 'bg-violet-600 dark:bg-violet-500',
+  [ContactCategory.INTERNE]: 'bg-slate-700 dark:bg-slate-400',
+  [ContactCategory.AUTRE]: 'bg-slate-400 dark:bg-slate-600',
 };
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -87,6 +99,16 @@ function getAvatarTone(category: ContactCategory): string {
   }
 }
 
+function computeContactCompleteness(c: Contact): number {
+  let points = 4; // firstName, lastName, email, phone are mandatory
+  if (c.company?.trim()) points += 1.5;
+  if (c.jobTitle?.trim()) points += 1.5;
+  if (c.city?.trim()) points += 1;
+  if (c.tags && c.tags.length > 0) points += 1;
+  if (c.notes?.trim()) points += 1;
+  return Math.round((points / 10) * 100);
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('directory');
   const [viewMode, setViewMode] = useState<DirectoryViewMode>('table');
@@ -106,6 +128,7 @@ export default function App() {
 
   // Search & filter state
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
   const [searchMode, setSearchMode] = useState<SearchMode>(SearchMode.PARTIAL);
   const [searchField, setSearchField] = useState<SearchField>(SearchField.ALL);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -125,14 +148,19 @@ export default function App() {
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [contactPendingDelete, setContactPendingDelete] = useState<Contact | null>(null);
 
-  // Quick copy & inline tag states
+  // Quick copy, inline notes & inline tag states
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [quickTagInput, setQuickTagInput] = useState<string>('');
+  const [inlineNotesDraft, setInlineNotesDraft] = useState<string>('');
+  const [isSavingInlineNotes, setIsSavingInlineNotes] = useState<boolean>(false);
+  const [isImportingSample, setIsImportingSample] = useState<boolean>(false);
   const [exportModalData, setExportModalData] = useState<{
     filename: string;
     format: 'csv' | 'json' | 'vcf';
     content: string;
   } | null>(null);
+
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -143,9 +171,16 @@ export default function App() {
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 280);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const activeFilters: ContactQueryFilters = useMemo(
     () => ({
-      q: searchQuery.trim() || undefined,
+      q: debouncedSearchQuery.trim() || undefined,
       searchMode,
       searchField,
       category: selectedCategory !== 'all' ? selectedCategory : undefined,
@@ -153,7 +188,15 @@ export default function App() {
       tag: selectedTag !== 'all' ? selectedTag : undefined,
       sortBy,
     }),
-    [searchQuery, searchMode, searchField, selectedCategory, onlyFavorites, selectedTag, sortBy]
+    [
+      debouncedSearchQuery,
+      searchMode,
+      searchField,
+      selectedCategory,
+      onlyFavorites,
+      selectedTag,
+      sortBy,
+    ]
   );
 
   const loadWorkspaceData = useCallback(async () => {
@@ -173,7 +216,6 @@ export default function App() {
       setStorageStatus(storageRes);
       setAuditLogs(auditRes.logs);
 
-      // Select first contact automatically on initial load if none selected
       setSelectedContactId((prev) => {
         if (prev && fullRes.contacts.some((c) => c.id === prev)) return prev;
         return filteredRes.contacts[0]?.id ?? null;
@@ -190,6 +232,84 @@ export default function App() {
   useEffect(() => {
     loadWorkspaceData();
   }, [loadWorkspaceData]);
+
+  // Apply alphabetical letter filter on top of API-filtered contacts
+  const displayedContacts = useMemo(() => {
+    if (selectedLetter === 'all') return filteredContacts;
+    return filteredContacts.filter((c) => {
+      const firstChar = (c.lastName || c.firstName || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .charAt(0)
+        .toUpperCase();
+      return firstChar === selectedLetter;
+    });
+  }, [filteredContacts, selectedLetter]);
+
+  const inspectedContact = useMemo(() => {
+    if (!selectedContactId) return null;
+    return (
+      displayedContacts.find((c) => c.id === selectedContactId) ||
+      allContacts.find((c) => c.id === selectedContactId) ||
+      null
+    );
+  }, [selectedContactId, displayedContacts, allContacts]);
+
+  // Sync inline notes draft when inspected contact changes
+  useEffect(() => {
+    setInlineNotesDraft(inspectedContact?.notes ?? '');
+  }, [inspectedContact?.id, inspectedContact?.notes]);
+
+  // Global keyboard shortcuts (/, Ctrl+K, Escape, Up/Down arrows)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isInputFocused =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable);
+
+      if ((e.key === '/' && !isInputFocused) || ((e.metaKey || e.ctrlKey) && e.key === 'k')) {
+        e.preventDefault();
+        setActiveTab('directory');
+        setTimeout(() => searchInputRef.current?.focus(), 20);
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        if (isFormModalOpen) setIsFormModalOpen(false);
+        else if (contactPendingDelete) setContactPendingDelete(null);
+        else if (exportModalData) setExportModalData(null);
+        return;
+      }
+
+      if (!isInputFocused && activeTab === 'directory' && displayedContacts.length > 0) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const idx = displayedContacts.findIndex((c) => c.id === selectedContactId);
+          const next = displayedContacts[Math.min(displayedContacts.length - 1, idx + 1)];
+          if (next) setSelectedContactId(next.id);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const idx = displayedContacts.findIndex((c) => c.id === selectedContactId);
+          const prev = displayedContacts[Math.max(0, idx - 1)];
+          if (prev) setSelectedContactId(prev.id);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    activeTab,
+    displayedContacts,
+    selectedContactId,
+    isFormModalOpen,
+    contactPendingDelete,
+    exportModalData,
+  ]);
 
   const showNotice = (msg: string) => {
     setToastMessage(msg);
@@ -209,19 +329,6 @@ export default function App() {
       showNotice(`Valeur : ${text}`);
     }
   };
-
-  // Apply alphabetical letter filter on top of API-filtered contacts
-  const displayedContacts = useMemo(() => {
-    if (selectedLetter === 'all') return filteredContacts;
-    return filteredContacts.filter((c) => {
-      const firstChar = (c.lastName || c.firstName || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .charAt(0)
-        .toUpperCase();
-      return firstChar === selectedLetter;
-    });
-  }, [filteredContacts, selectedLetter]);
 
   // Letters that exist in filteredContacts
   const activeLettersSet = useMemo(() => {
@@ -253,16 +360,34 @@ export default function App() {
     const countries = new Set(allContacts.map((c) => c.country).filter(Boolean));
     const favoritesCount = allContacts.filter((c) => c.favorite).length;
     const categoryCounts: Record<string, number> = { all: allContacts.length };
+    let totalCompleteness = 0;
     for (const c of allContacts) {
       categoryCounts[c.category] = (categoryCounts[c.category] || 0) + 1;
+      totalCompleteness += computeContactCompleteness(c);
     }
+    const avgCompleteness =
+      allContacts.length > 0 ? Math.round(totalCompleteness / allContacts.length) : 100;
+
     return {
       companiesCount: companies.size,
       countriesCount: countries.size,
       favoritesCount,
       categoryCounts,
+      avgCompleteness,
     };
   }, [allContacts]);
+
+  // Group contacts by company for the "Organisations" view mode
+  const groupedByCompany = useMemo(() => {
+    const map = new Map<string, Contact[]>();
+    for (const c of displayedContacts) {
+      const compName = c.company?.trim() || 'Consultants & Indépendants';
+      const arr = map.get(compName) || [];
+      arr.push(c);
+      map.set(compName, arr);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[1].length - a[1].length);
+  }, [displayedContacts]);
 
   // Map of contact IDs involved in duplicates
   const duplicateContactIds = useMemo(() => {
@@ -274,14 +399,14 @@ export default function App() {
     return set;
   }, [duplicates]);
 
-  const inspectedContact = useMemo(() => {
-    if (!selectedContactId) return null;
-    return (
-      displayedContacts.find((c) => c.id === selectedContactId) ||
-      allContacts.find((c) => c.id === selectedContactId) ||
-      null
+  // Related contacts in the same company for the inspector drawer
+  const colleaguesInSameCompany = useMemo(() => {
+    if (!inspectedContact || !inspectedContact.company.trim()) return [];
+    const comp = inspectedContact.company.trim().toLowerCase();
+    return allContacts.filter(
+      (c) => c.id !== inspectedContact.id && c.company.trim().toLowerCase() === comp
     );
-  }, [selectedContactId, displayedContacts, allContacts]);
+  }, [inspectedContact, allContacts]);
 
   const handleSaveContact = async (payload: ContactInput, contactId?: string) => {
     if (contactId) {
@@ -308,6 +433,30 @@ export default function App() {
       await loadWorkspaceData();
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Action non autorisée.');
+    }
+  };
+
+  const handleInlineCategoryChange = async (contact: Contact, nextCategory: ContactCategory) => {
+    try {
+      await apiClient.updateContact(contact.id, { category: nextCategory }, userRole);
+      showNotice(`Catégorie mise à jour (${nextCategory}) pour ${contact.firstName}`);
+      await loadWorkspaceData();
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Modification refusée.');
+    }
+  };
+
+  const handleSaveInlineNotes = async () => {
+    if (!inspectedContact) return;
+    setIsSavingInlineNotes(true);
+    try {
+      await apiClient.updateContact(inspectedContact.id, { notes: inlineNotesDraft }, userRole);
+      showNotice(`Note enregistrée pour ${inspectedContact.firstName} ${inspectedContact.lastName}`);
+      await loadWorkspaceData();
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Impossible de sauvegarder la note.');
+    } finally {
+      setIsSavingInlineNotes(false);
     }
   };
 
@@ -490,6 +639,7 @@ export default function App() {
 
   const resetAllFilters = () => {
     setSearchQuery('');
+    setDebouncedSearchQuery('');
     setSearchMode(SearchMode.PARTIAL);
     setSearchField(SearchField.ALL);
     setSelectedCategory('all');
@@ -497,6 +647,49 @@ export default function App() {
     setSelectedTag('all');
     setSelectedLetter('all');
     setSortBy('name_asc');
+  };
+
+  const handleImportSampleDataset = async () => {
+    setIsImportingSample(true);
+    setErrorMessage(null);
+    try {
+      if (allContacts.length === 0 && userRole === UserRole.ADMIN) {
+        const res = await apiClient.resetDemoData(userRole);
+        resetAllFilters();
+        showNotice(`${res.message} (${res.count} contacts d'exemple chargés).`);
+      } else {
+        const sampleCsv = [
+          'firstName,lastName,email,phone,company,jobTitle,category,tags,city,country,favorite,notes',
+          'Éléonore,Vasseur,eleonore.vasseur@luminance-ai.fr,+33 6 44 55 66 77,Luminance Analytics,VP Data & IA,client,"vip;ia;cloud",Paris,France,true,Contrat cadre annuel signé.',
+          'Marc-Antoine,Delacroix,ma.delacroix@helvetia-med.ch,+41 22 819 00 11,Helvetia MedTech,Directeur R&D,partenaire,"biotech;suisse",Genève,Suisse,true,Partenaire stratégique R&D.',
+          'Sonia,Benali,s.benali@greengrid-energy.eu,+32 2 588 44 10,GreenGrid Europe,Responsable Achats,fournisseur,"energie;esg",Bruxelles,Belgique,false,Fournisseur infrastructure verte.',
+          'Gaspard,Lemoine,gaspard.lemoine@fintech-horizon.fr,06 78 91 02 34,Fintech Horizon,Directeur Financier,prospect,"finance;q4",Lyon,France,false,Démonstration produit planifiée.',
+        ].join('\n');
+
+        const report = await apiClient.importContacts(
+          {
+            format: 'csv',
+            content: sampleCsv,
+            dryRun: false,
+            duplicateStrategy: 'update',
+          },
+          userRole
+        );
+        resetAllFilters();
+        showNotice(
+          `Exemples importés avec succès : ${report.importedCount} créé(s), ${report.updatedCount} mis à jour.`
+        );
+      }
+      await loadWorkspaceData();
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Impossible d'importer les exemples (vérifiez que votre rôle RBAC est admin ou editor)."
+      );
+    } finally {
+      setIsImportingSample(false);
+    }
   };
 
   const hasActiveFilters =
@@ -507,6 +700,12 @@ export default function App() {
     onlyFavorites ||
     selectedTag !== 'all' ||
     selectedLetter !== 'all';
+
+  const inspectedCompleteness = inspectedContact
+    ? computeContactCompleteness(inspectedContact)
+    : 100;
+  const isInlineNotesDirty =
+    inspectedContact && inlineNotesDraft.trim() !== (inspectedContact.notes || '').trim();
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
@@ -596,40 +795,33 @@ export default function App() {
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 text-xs">
           <div className="flex flex-wrap items-center gap-2 text-slate-600 dark:text-slate-400">
             <span className="font-medium text-slate-900 dark:text-slate-200">
-              Espace de travail CRM &amp; Annuaire B2B
+              Annuaire Professionnel
             </span>
             <span aria-hidden="true">·</span>
             <span className="font-mono tabular-nums">
-              {stats.companiesCount} entreprises
+              {stats.companiesCount} organisations · {stats.countriesCount} pays
             </span>
             <span aria-hidden="true">·</span>
             <span className="font-mono tabular-nums">
-              {stats.countriesCount} pays
-            </span>
-            <span aria-hidden="true">·</span>
-            <span>
-              Persistance SQLite WAL :{' '}
-              <strong className="font-mono text-emerald-700 dark:text-emerald-400">
-                {storageStatus?.integrityOk !== false ? 'Synchronisée' : 'Alerte'}
-              </strong>
+              Qualité des fiches : {stats.avgCompleteness}%
             </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* Role Selector for testing RBAC */}
+            {/* Profile Selector */}
             <div className="flex items-center gap-1.5">
               <label htmlFor="workspace-role-select" className="text-slate-500 dark:text-slate-400">
-                Rôle RBAC :
+                Profil :
               </label>
               <select
                 id="workspace-role-select"
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value as UserRole)}
-                className="rounded-md border border-slate-300 bg-white px-2.5 py-1 font-mono text-xs text-slate-800 focus:border-slate-900 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-800 focus:border-slate-900 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
               >
-                <option value={UserRole.ADMIN}>admin (Accès complet)</option>
-                <option value={UserRole.EDITOR}>editor (Création / Modif / Import)</option>
-                <option value={UserRole.VIEWER}>viewer (Lecture / Export seul)</option>
+                <option value={UserRole.ADMIN}>Administrateur</option>
+                <option value={UserRole.EDITOR}>Éditeur</option>
+                <option value={UserRole.VIEWER}>Lecteur seul</option>
               </select>
             </div>
 
@@ -649,110 +841,127 @@ export default function App() {
 
       {/* Main Content Container */}
       <main className="mx-auto max-w-[1440px] px-6 py-6">
-        {/* Interactive KPI Strip */}
+        {/* Interactive KPI Strip + Category Distribution Bar */}
         <section
           aria-label="Indicateurs clés du carnet de contacts"
-          className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          className="mb-6 space-y-3"
         >
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('directory');
-              resetAllFilters();
-            }}
-            className="flex items-start justify-between rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
-          >
-            <div>
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Contacts enregistrés
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('directory');
+                resetAllFilters();
+              }}
+              className="flex items-start justify-between rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
+            >
+              <div>
+                <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Contacts enregistrés
+                </div>
+                <div className="mt-1 font-mono text-2xl font-bold text-slate-900 tabular-nums dark:text-slate-100">
+                  {allContacts.length}
+                </div>
+                <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {stats.companiesCount} organisations · {stats.countriesCount} pays
+                </div>
               </div>
-              <div className="mt-1 font-mono text-2xl font-bold text-slate-900 tabular-nums dark:text-slate-100">
-                {allContacts.length}
-              </div>
-              <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                {stats.companiesCount} organisations · {stats.countriesCount} pays
-              </div>
-            </div>
-            <Users className="h-5 w-5 text-slate-400" />
-          </button>
+              <Users className="h-5 w-5 text-slate-400" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('directory');
-              setOnlyFavorites((f) => !f);
-            }}
-            className={`flex items-start justify-between rounded-xl border p-4 text-left transition-colors ${
-              onlyFavorites && activeTab === 'directory'
-                ? 'border-amber-400 bg-amber-50/40 dark:border-amber-500/70 dark:bg-amber-950/20'
-                : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
-            }`}
-          >
-            <div>
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Contacts favoris &amp; VIP
-              </div>
-              <div className="mt-1 font-mono text-2xl font-bold text-slate-900 tabular-nums dark:text-slate-100">
-                {stats.favoritesCount}
-              </div>
-              <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                {onlyFavorites ? 'Filtre favoris actif (cliquer pour tout voir)' : 'Cliquer pour filtrer les favoris'}
-              </div>
-            </div>
-            <Star
-              className={`h-5 w-5 ${
-                onlyFavorites ? 'fill-amber-400 text-amber-500' : 'text-amber-500'
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('directory');
+                setOnlyFavorites((f) => !f);
+              }}
+              className={`flex items-start justify-between rounded-xl border p-4 text-left transition-colors ${
+                onlyFavorites && activeTab === 'directory'
+                  ? 'border-amber-400 bg-amber-50/40 dark:border-amber-500/70 dark:bg-amber-950/20'
+                  : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
               }`}
-            />
-          </button>
+            >
+              <div>
+                <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Contacts favoris &amp; VIP
+                </div>
+                <div className="mt-1 font-mono text-2xl font-bold text-slate-900 tabular-nums dark:text-slate-100">
+                  {stats.favoritesCount}
+                </div>
+                <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {onlyFavorites
+                    ? 'Filtre favoris actif (cliquer pour tout voir)'
+                    : 'Cliquer pour filtrer les favoris'}
+                </div>
+              </div>
+              <Star
+                className={`h-5 w-5 ${
+                  onlyFavorites ? 'fill-amber-400 text-amber-500' : 'text-amber-500'
+                }`}
+              />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('duplicates')}
-            className={`flex items-start justify-between rounded-xl border p-4 text-left transition-colors ${
-              activeTab === 'duplicates'
-                ? 'border-slate-900 bg-white dark:border-emerald-500 dark:bg-slate-900'
-                : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
-            }`}
-          >
-            <div>
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Doublons détectés
+            <button
+              type="button"
+              onClick={() => setActiveTab('duplicates')}
+              className={`flex items-start justify-between rounded-xl border p-4 text-left transition-colors ${
+                activeTab === 'duplicates'
+                  ? 'border-slate-900 bg-white dark:border-emerald-500 dark:bg-slate-900'
+                  : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
+              }`}
+            >
+              <div>
+                <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Doublons détectés
+                </div>
+                <div className="mt-1 font-mono text-2xl font-bold text-slate-900 tabular-nums dark:text-slate-100">
+                  {duplicates.length}
+                </div>
+                <div className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                  {duplicates.length > 0
+                    ? 'Examiner et fusionner en 1 clic →'
+                    : 'Aucune anomalie d’homonymie'}
+                </div>
               </div>
-              <div className="mt-1 font-mono text-2xl font-bold text-slate-900 tabular-nums dark:text-slate-100">
-                {duplicates.length}
-              </div>
-              <div className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-                {duplicates.length > 0
-                  ? 'Examiner et fusionner en 1 clic →'
-                  : 'Aucune anomalie d’homonymie'}
-              </div>
-            </div>
-            <GitMerge className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          </button>
+              <GitMerge className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('import_export')}
-            className={`flex items-start justify-between rounded-xl border p-4 text-left transition-colors ${
-              activeTab === 'import_export'
-                ? 'border-slate-900 bg-white dark:border-emerald-500 dark:bg-slate-900'
-                : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
-            }`}
-          >
-            <div>
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Sauvegarde &amp; Flux CSV/JSON
+            <button
+              type="button"
+              onClick={() => setActiveTab('import_export')}
+              className={`flex items-start justify-between rounded-xl border p-4 text-left transition-colors ${
+                activeTab === 'import_export'
+                  ? 'border-slate-900 bg-white dark:border-emerald-500 dark:bg-slate-900'
+                  : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
+              }`}
+            >
+              <div>
+                <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Import &amp; Export
+                </div>
+                <div className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100">
+                  CSV · JSON · vCard
+                </div>
+                <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  Importer ou exporter vos fiches →
+                </div>
               </div>
-              <div className="mt-1 font-mono text-lg font-bold text-emerald-700 dark:text-emerald-400">
-                Intégrité OK
-              </div>
-              <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                SQLite WAL + Miroir JSON atomique →
-              </div>
-            </div>
-            <Database className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-          </button>
+              <Download className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            </button>
+          </div>
+
+          {/* Interactive Recharts Category Donut Chart in Directory Header */}
+          <CategoryDonutChart
+            categoryCounts={stats.categoryCounts}
+            totalContacts={allContacts.length}
+            selectedCategory={selectedCategory}
+            avgCompleteness={stats.avgCompleteness}
+            onSelectCategory={(category) => {
+              setActiveTab('directory');
+              setSelectedCategory(category);
+            }}
+            onImportSampleDataset={handleImportSampleDataset}
+          />
         </section>
 
         {/* Toast & Error Banners */}
@@ -849,25 +1058,29 @@ export default function App() {
               className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900"
             >
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-                {/* Search Input */}
+                {/* Search Input with keyboard shortcut hint */}
                 <div className="lg:col-span-5">
-                  <label
-                    htmlFor="contact-search-input"
-                    className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300"
-                  >
-                    Recherche instantanée (nom, email, téléphone E.164, société, ville, note)
-                  </label>
+                  <div className="mb-1.5 flex items-center justify-between text-xs">
+                    <label
+                      htmlFor="contact-search-input"
+                      className="font-medium text-slate-700 dark:text-slate-300"
+                    >
+                      Rechercher un contact (nom, email, téléphone, entreprise, ville)
+                    </label>
+                    <span className="font-mono text-[11px] text-slate-400">Raccourci : /</span>
+                  </div>
                   <div className="relative">
                     <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <input
+                      ref={searchInputRef}
                       id="contact-search-input"
                       type="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder={
                         searchMode === SearchMode.EXACT
-                          ? 'Correspondance exacte (ex. camille.moreau@atelier-veridian.fr ou 0614283950)...'
-                          : 'Recherche partielle (ex. Moreau, +33 6, Genève, biotech)...'
+                          ? 'Correspondance exacte (ex. camille.moreau@atelier-veridian.fr)...'
+                          : 'Recherche rapide (ex. Moreau, +33 6, Genève, biotech)...'
                       }
                       className="w-full rounded-lg border border-slate-300 bg-white py-2 pr-4 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-slate-400"
                     />
@@ -953,7 +1166,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Second Filter Row: Interactive Category Segmented Controls, Tag Filter, View Switcher, Quick Export */}
+              {/* Second Filter Row: Interactive Category Segmented Controls, Tag Filter, 3-Mode View Switcher, Quick Export */}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-4 dark:border-slate-800">
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Category Segmented Filter Buttons with counts */}
@@ -1007,13 +1220,12 @@ export default function App() {
                   )}
                 </div>
 
-                {/* View Mode Toggle + Quick Export */}
+                {/* 3-Way View Mode Toggle (Tableau / Cartes / Organisations) + Quick Export */}
                 <div className="flex flex-wrap items-center gap-2.5 text-xs">
                   <span className="font-mono text-slate-500 tabular-nums dark:text-slate-400">
                     {displayedContacts.length} sur {allContacts.length} affiché(s)
                   </span>
 
-                  {/* Table vs Card Grid Switcher */}
                   <div className="inline-flex rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
                     <button
                       type="button"
@@ -1038,6 +1250,18 @@ export default function App() {
                     >
                       <LayoutGrid className="h-3.5 w-3.5" />
                       <span>Cartes</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('companies')}
+                      className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
+                        viewMode === 'companies'
+                          ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-slate-100'
+                          : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
+                      }`}
+                    >
+                      <Building2 className="h-3.5 w-3.5" />
+                      <span>Organisations</span>
                     </button>
                   </div>
 
@@ -1143,11 +1367,7 @@ export default function App() {
 
             {/* Main Directory Grid + Side Inspector */}
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-              <div
-                className={`${
-                  inspectedContact ? 'lg:col-span-8' : 'lg:col-span-12'
-                }`}
-              >
+              <div className={`${inspectedContact ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
                 {isLoading ? (
                   /* Skeleton Loading State */
                   <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white p-6 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
@@ -1162,38 +1382,24 @@ export default function App() {
                     ))}
                   </div>
                 ) : displayedContacts.length === 0 ? (
-                  /* Empty State */
-                  <div className="rounded-xl border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-900">
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Aucun contact ne correspond à vos critères
-                    </h3>
-                    <p className="mx-auto mt-1.5 max-w-md text-xs text-slate-500 dark:text-slate-400">
-                      {hasActiveFilters
-                        ? 'Essayez de passer en mode Recherche Partielle ou de réinitialiser les filtres actifs.'
-                        : 'Votre répertoire est actuellement vide. Créez votre premier contact ou importez un fichier CSV/JSON.'}
-                    </p>
-                    <div className="mt-5 flex items-center justify-center gap-3">
-                      {hasActiveFilters && (
-                        <button
-                          type="button"
-                          onClick={resetAllFilters}
-                          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        >
-                          Afficher tous les contacts
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingContact(null);
-                          setIsFormModalOpen(true);
-                        }}
-                        className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-medium text-white hover:bg-slate-800 dark:bg-emerald-600"
-                      >
-                        Créer un contact
-                      </button>
-                    </div>
-                  </div>
+                  /* Engaging Vector Empty State with 1-Click Sample Import */
+                  <DirectoryEmptyState
+                    isDatabaseEmpty={allContacts.length === 0}
+                    hasActiveFilters={hasActiveFilters}
+                    searchQuery={searchQuery}
+                    isExactMode={searchMode === SearchMode.EXACT}
+                    selectedCategory={selectedCategory}
+                    selectedLetter={selectedLetter}
+                    isImportingSample={isImportingSample}
+                    onResetFilters={resetAllFilters}
+                    onSwitchToPartialSearch={() => setSearchMode(SearchMode.PARTIAL)}
+                    onCreateContact={() => {
+                      setEditingContact(null);
+                      setIsFormModalOpen(true);
+                    }}
+                    onImportSampleDataset={handleImportSampleDataset}
+                    onOpenImportWizard={() => setActiveTab('import_export')}
+                  />
                 ) : viewMode === 'table' ? (
                   /* High-Density Data Table View */
                   <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -1215,8 +1421,8 @@ export default function App() {
                             </th>
                             <th className="w-9 py-3" aria-label="Favori" />
                             <th className="px-4 py-3 font-medium">Contact &amp; Fonction</th>
-                            <th className="px-4 py-3 font-medium">Coordonnées (Email &amp; E.164)</th>
-                            <th className="px-4 py-3 font-medium">Organisation &amp; Métadonnées</th>
+                            <th className="px-4 py-3 font-medium">Coordonnées</th>
+                            <th className="px-4 py-3 font-medium">Organisation &amp; Catégorie</th>
                             <th className="px-5 py-3 text-right font-medium">Actions</th>
                           </tr>
                         </thead>
@@ -1329,7 +1535,7 @@ export default function App() {
                                       type="button"
                                       onClick={() =>
                                         handleCopyText(
-                                          contact.phoneNormalized || contact.phone,
+                                          contact.phone,
                                           `phone-${contact.id}`
                                         )
                                       }
@@ -1343,10 +1549,6 @@ export default function App() {
                                         </span>
                                       )}
                                     </button>
-                                    <span aria-hidden="true">·</span>
-                                    <span className="text-[11px] text-slate-400 dark:text-slate-500">
-                                      {contact.phoneNormalized}
-                                    </span>
                                   </div>
                                 </td>
 
@@ -1408,7 +1610,7 @@ export default function App() {
                       </table>
                     </div>
                   </div>
-                ) : (
+                ) : viewMode === 'grid' ? (
                   /* Business Card Grid View */
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {displayedContacts.map((contact) => {
@@ -1527,6 +1729,66 @@ export default function App() {
                       );
                     })}
                   </div>
+                ) : (
+                  /* View Mode 3: Grouped by Organization (Entreprises) */
+                  <div className="space-y-4">
+                    {groupedByCompany.map(([companyName, members]) => (
+                      <div
+                        key={companyName}
+                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+                      >
+                        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3.5 dark:border-slate-800">
+                          <div className="flex items-center gap-2.5">
+                            <Building2 className="h-4 w-4 text-slate-400" />
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                              {companyName}
+                            </h3>
+                          </div>
+                          <span className="font-mono text-xs text-slate-500 tabular-nums dark:text-slate-400">
+                            {members.length} interlocuteur(s) · {members[0]?.city || 'France'}
+                          </span>
+                        </div>
+                        <div className="divide-y divide-slate-200 dark:divide-slate-800">
+                          {members.map((member) => {
+                            const isSelected = inspectedContact?.id === member.id;
+                            return (
+                              <div
+                                key={member.id}
+                                onClick={() => setSelectedContactId(member.id)}
+                                className={`flex cursor-pointer flex-wrap items-center justify-between gap-4 px-5 py-3 text-xs transition-colors ${
+                                  isSelected
+                                    ? 'bg-slate-100/90 dark:bg-slate-800/70'
+                                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-mono text-xs font-bold ${getAvatarTone(
+                                      member.category
+                                    )}`}
+                                  >
+                                    {getInitials(member.firstName, member.lastName)}
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold text-slate-900 dark:text-slate-100">
+                                      {member.firstName} {member.lastName}
+                                    </div>
+                                    <div className="text-slate-500 dark:text-slate-400">
+                                      {member.jobTitle || 'Collaborateur'} ·{' '}
+                                      <span className="capitalize">{member.category}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="font-mono text-slate-600 tabular-nums dark:text-slate-300">
+                                  {member.email} · {member.phone}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
 
@@ -1580,13 +1842,25 @@ export default function App() {
                     </button>
                   </div>
 
+                  {/* Profile Completeness Indicator */}
+                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span>Complétude de la fiche :</span>
+                    <span className="font-mono font-semibold text-slate-800 tabular-nums dark:text-slate-200">
+                      {inspectedCompleteness}%
+                    </span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                    <div
+                      style={{ width: `${inspectedCompleteness}%` }}
+                      className="h-full bg-emerald-600 transition-all dark:bg-emerald-500"
+                    />
+                  </div>
+
                   {/* Quick Contact Action Strip */}
                   <div className="mt-4 grid grid-cols-3 gap-2">
                     <button
                       type="button"
-                      onClick={() =>
-                        handleCopyText(inspectedContact.email, 'inspector-email')
-                      }
+                      onClick={() => handleCopyText(inspectedContact.email, 'inspector-email')}
                       className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 bg-slate-50/70 p-2.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:hover:bg-slate-800"
                     >
                       {copiedKey === 'inspector-email' ? (
@@ -1614,9 +1888,7 @@ export default function App() {
                       ) : (
                         <Phone className="h-4 w-4 text-slate-500" />
                       )}
-                      <span>
-                        {copiedKey === 'inspector-phone' ? 'N° copié !' : 'Copier Tél.'}
-                      </span>
+                      <span>{copiedKey === 'inspector-phone' ? 'N° copié !' : 'Copier Tél.'}</span>
                     </button>
 
                     <button
@@ -1632,22 +1904,15 @@ export default function App() {
                   {/* Detailed Attributes */}
                   <dl className="mt-5 space-y-3.5 border-t border-slate-200 pt-4 text-xs dark:border-slate-800">
                     <div>
-                      <dt className="text-slate-500 dark:text-slate-400">
-                        Adresse email validée (RFC 5322)
-                      </dt>
+                      <dt className="text-slate-500 dark:text-slate-400">Adresse email</dt>
                       <dd className="mt-0.5 font-mono font-medium text-slate-900 dark:text-slate-100">
                         {inspectedContact.email}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500 dark:text-slate-400">
-                        Téléphone (Affichage &amp; Canonique E.164)
-                      </dt>
+                      <dt className="text-slate-500 dark:text-slate-400">Téléphone</dt>
                       <dd className="mt-0.5 font-mono text-slate-900 tabular-nums dark:text-slate-100">
-                        {inspectedContact.phone} ·{' '}
-                        <span className="text-emerald-700 dark:text-emerald-400">
-                          {inspectedContact.phoneNormalized}
-                        </span>
+                        {inspectedContact.phone}
                       </dd>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
@@ -1656,8 +1921,24 @@ export default function App() {
                           <Building2 className="h-3.5 w-3.5" />
                           <span>Catégorie</span>
                         </dt>
-                        <dd className="mt-0.5 font-medium text-slate-800 capitalize dark:text-slate-200">
-                          {inspectedContact.category}
+                        <dd className="mt-1">
+                          <select
+                            aria-label="Changer la catégorie du contact"
+                            value={inspectedContact.category}
+                            onChange={(e) =>
+                              handleInlineCategoryChange(
+                                inspectedContact,
+                                e.target.value as ContactCategory
+                              )
+                            }
+                            className="w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium capitalize focus:border-slate-900 focus:outline-none dark:border-slate-700 dark:bg-slate-950"
+                          >
+                            {Object.values(ContactCategory).map((cat) => (
+                              <option key={cat} value={cat}>
+                                {cat}
+                              </option>
+                            ))}
+                          </select>
                         </dd>
                       </div>
                       <div>
@@ -1665,7 +1946,7 @@ export default function App() {
                           <MapPin className="h-3.5 w-3.5" />
                           <span>Localisation</span>
                         </dt>
-                        <dd className="mt-0.5 font-medium text-slate-800 dark:text-slate-200">
+                        <dd className="mt-1.5 font-medium text-slate-800 dark:text-slate-200">
                           {inspectedContact.city || 'Ville N/A'} · {inspectedContact.country}
                         </dd>
                       </div>
@@ -1716,17 +1997,70 @@ export default function App() {
                       </form>
                     </div>
 
+                    {/* Inline Editable Notes */}
                     <div>
-                      <dt className="text-slate-500 dark:text-slate-400">Notes métier</dt>
-                      <dd className="mt-1 rounded-lg border border-slate-200 bg-slate-50/60 p-3 whitespace-pre-line text-slate-700 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-300">
-                        {inspectedContact.notes || 'Aucune note enregistrée.'}
-                      </dd>
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="inspector-inline-notes"
+                          className="text-slate-500 dark:text-slate-400"
+                        >
+                          Notes métier (Édition rapide)
+                        </label>
+                        {isInlineNotesDirty && (
+                          <button
+                            type="button"
+                            disabled={isSavingInlineNotes}
+                            onClick={handleSaveInlineNotes}
+                            className="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:underline dark:text-emerald-400"
+                          >
+                            <Save className="h-3 w-3" />
+                            <span>
+                              {isSavingInlineNotes ? 'Sauvegarde...' : 'Enregistrer la note'}
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                      <textarea
+                        id="inspector-inline-notes"
+                        rows={3}
+                        value={inlineNotesDraft}
+                        onChange={(e) => setInlineNotesDraft(e.target.value)}
+                        placeholder="Saisissez vos notes d'échange ou de suivi..."
+                        className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50/70 p-2.5 text-xs text-slate-800 focus:border-slate-900 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-200"
+                      />
                     </div>
 
-                    <div className="border-t border-slate-200 pt-3 font-mono text-[11px] text-slate-400 tabular-nums dark:border-slate-800">
-                      <div>UUID : {inspectedContact.id}</div>
+                    {/* Colleagues in the same organization */}
+                    {colleaguesInSameCompany.length > 0 && (
+                      <div className="border-t border-slate-200 pt-3 dark:border-slate-800">
+                        <dt className="text-slate-500 dark:text-slate-400">
+                          Autres contacts chez {inspectedContact.company} (
+                          {colleaguesInSameCompany.length})
+                        </dt>
+                        <dd className="mt-1.5 space-y-1">
+                          {colleaguesInSameCompany.map((col) => (
+                            <button
+                              key={col.id}
+                              type="button"
+                              onClick={() => setSelectedContactId(col.id)}
+                              className="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-800"
+                            >
+                              <span className="font-medium text-slate-800 dark:text-slate-200">
+                                {col.firstName} {col.lastName}
+                              </span>
+                              <span className="font-mono text-[11px] text-slate-500">
+                                {col.jobTitle || col.email}
+                              </span>
+                            </button>
+                          ))}
+                        </dd>
+                      </div>
+                    )}
+
+                    <div className="border-t border-slate-200 pt-3 text-[11px] text-slate-400 tabular-nums dark:border-slate-800">
                       <div>
-                        Mis à jour : {inspectedContact.updatedAt.replace('T', ' ').slice(0, 19)} UTC
+                        Dernière modification :{' '}
+                        {inspectedContact.updatedAt.replace('T', ' ').slice(0, 16)}
                       </div>
                     </div>
                   </dl>
@@ -1800,9 +2134,30 @@ export default function App() {
             logs={auditLogs}
             currentRole={userRole}
             onRoleChange={setUserRole}
+            onReplaySearch={(query) => {
+              setSearchQuery(query);
+              setDebouncedSearchQuery(query);
+              setActiveTab('directory');
+            }}
           />
         )}
       </main>
+
+      {/* Clean End-to-End Authorship Footer */}
+      <footer className="mt-10 border-t border-slate-200 bg-white px-6 py-4 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3">
+          <div>
+            <strong className="font-semibold text-slate-900 dark:text-slate-200">
+              Veridian Contacts
+            </strong>{' '}
+            · Projet conçu et réalisé de bout en bout par{' '}
+            <strong className="font-semibold text-slate-900 dark:text-slate-100">
+              Mendel Temgoua
+            </strong>
+          </div>
+          <div className="text-slate-400">Gestionnaire de contacts professionnel</div>
+        </div>
+      </footer>
 
       {/* Create / Edit Contact Modal */}
       <ContactFormModal
@@ -1833,8 +2188,8 @@ export default function App() {
               <strong className="text-slate-900 dark:text-slate-100">
                 {contactPendingDelete.firstName} {contactPendingDelete.lastName}
               </strong>{' '}
-              ({contactPendingDelete.email}) ? Cette opération est tracée dans le journal
-              d&apos;audit et requiert le rôle <code className="font-mono">admin</code>.
+              ({contactPendingDelete.email}) ? Cette action est enregistrée dans le journal
+              d&apos;activité.
             </p>
             <div className="mt-5 flex items-center justify-end gap-3">
               <button

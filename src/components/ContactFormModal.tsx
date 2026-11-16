@@ -1,8 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Sparkles, X } from 'lucide-react';
 import { findDuplicatesForCandidate } from '../shared/duplicates';
 import { Contact, ContactCategory, ContactInput } from '../shared/types';
-import { validateAndNormalizePhone, validateContactInput, validateEmailAddress } from '../shared/validation';
+import {
+  validateAndNormalizePhone,
+  validateContactInput,
+  validateEmailAddress,
+} from '../shared/validation';
 
 interface ContactFormModalProps {
   isOpen: boolean;
@@ -109,6 +113,38 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
 
   if (!isOpen) return null;
 
+  const applyQuickPreset = (preset: 'vip' | 'partner') => {
+    setFieldErrors({});
+    setGeneralError(null);
+    if (preset === 'vip') {
+      setFirstName('Margaux');
+      setLastName('Delcourt');
+      setEmail('m.delcourt@lumina-aerospace.fr');
+      setPhone('+33 6 42 88 19 03');
+      setCompany('Lumina Aerospace');
+      setJobTitle('VP Ingénierie Systèmes');
+      setCategory(ContactCategory.CLIENT);
+      setTagsInput('vip, aeronautique, contrat-pluriannuel');
+      setCity('Toulouse');
+      setCountry('France');
+      setFavorite(true);
+      setNotes('Décideuse principale pour le programme avionique 2027.');
+    } else {
+      setFirstName('Henrik');
+      setLastName('Lindqvist');
+      setEmail('henrik.lindqvist@nordic-grid.se');
+      setPhone('+46 8 501 234 90');
+      setCompany('Nordic Grid AB');
+      setJobTitle('Directeur Alliances Stratégiques');
+      setCategory(ContactCategory.PARTENAIRE);
+      setTagsInput('scandinavie, energie, partenaire-cle');
+      setCity('Stockholm');
+      setCountry('Suède');
+      setFavorite(false);
+      setNotes('Partenaire de distribution exclusif pour l’Europe du Nord.');
+    }
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setGeneralError(null);
@@ -163,12 +199,12 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
       aria-modal="true"
       aria-labelledby="contact-modal-title"
     >
-      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-xl dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
+      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-2xl dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
           <div>
             <h2 id="contact-modal-title" className="text-lg font-semibold tracking-tight">
-              {initialContact ? 'Modifier la fiche contact' : 'Nouveau contact'}
+              {initialContact ? 'Modifier la fiche contact' : 'Nouvelle fiche contact'}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Validation stricte RFC 5322 (email) et normalisation internationale E.164 (téléphone)
@@ -184,8 +220,38 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
           </button>
         </div>
 
+        {/* Quick Fill Bar when creating a new contact */}
+        {!initialContact && (
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50/80 px-6 py-2.5 text-xs dark:border-slate-800 dark:bg-slate-950/50">
+            <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Remplissage rapide de démonstration :</span>
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => applyQuickPreset('vip')}
+                className="rounded-md border border-slate-300 bg-white px-2.5 py-1 font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              >
+                Profil Client VIP (France)
+              </button>
+              <button
+                type="button"
+                onClick={() => applyQuickPreset('partner')}
+                className="rounded-md border border-slate-300 bg-white px-2.5 py-1 font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              >
+                Profil Partenaire International (Suède)
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Form Body */}
-        <form onSubmit={handleFormSubmit} className="flex-1 space-y-5 overflow-y-auto px-6 py-5" noValidate>
+        <form
+          onSubmit={handleFormSubmit}
+          className="flex-1 space-y-5 overflow-y-auto px-6 py-5"
+          noValidate
+        >
           {generalError && (
             <div
               role="alert"
@@ -205,7 +271,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               <div className="flex items-center gap-2 font-semibold">
                 <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                 <span>
-                  Doublon potentiel détecté ({potentialDuplicates.length}{' '}
+                  Doublon potentiel détecté en temps réel ({potentialDuplicates.length}{' '}
                   {potentialDuplicates.length > 1 ? 'fiches proches' : 'fiche proche'})
                 </span>
               </div>
@@ -245,7 +311,9 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                 }`}
               />
               {fieldErrors.firstName && (
-                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.firstName}</p>
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                  {fieldErrors.firstName}
+                </p>
               )}
             </div>
 
@@ -304,7 +372,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               ) : emailLiveCheck && emailLiveCheck.valid ? (
                 <p className="mt-1 flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-400">
                   <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>Format email valide</span>
+                  <span>Format RFC 5322 valide ({emailLiveCheck.normalized})</span>
                 </p>
               ) : null}
             </div>
@@ -475,7 +543,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               htmlFor="field-notes"
               className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300"
             >
-              Notes & Contexte métier
+              Notes &amp; Contexte métier
             </label>
             <textarea
               id="field-notes"
@@ -494,7 +562,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
               onClick={onClose}
               className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-medium whitespace-nowrap text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             >
-              Annuler
+              Annuler (Échap)
             </button>
             <button
               type="submit"

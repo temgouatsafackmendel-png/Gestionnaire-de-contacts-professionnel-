@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <rect width="1280" height="720" fill="#F8FAFC"/>
+
+  <!-- Top Bar -->
+  <rect x="0" y="0" width="1280" height="58" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="32" y="35" font-size="17" font-weight="700" fill="#0F172A">Veridian Contacts</text>
+  <text x="410" y="34" font-size="13" font-weight="600" fill="#0F172A">Répertoire (0)</text>
+  <line x1="410" y1="46" x2="500" y2="46" stroke="#0F172A" stroke-width="2.5"/>
+  <text x="535" y="34" font-size="13" font-weight="500" fill="#64748B">Doublons (0)</text>
+  <text x="645" y="34" font-size="13" font-weight="500" fill="#64748B">Import &amp; Export</text>
+  <text x="770" y="34" font-size="13" font-weight="500" fill="#64748B">Journal d'Audit (4)</text>
+  <rect x="1108" y="14" width="140" height="32" rx="7" fill="#0F172A"/>
+  <text x="1126" y="34" font-size="12" font-weight="600" fill="#FFFFFF">+ Nouveau Contact</text>
+
+  <!-- Empty Donut Placeholder Header -->
+  <rect x="32" y="82" width="1216" height="78" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-dasharray="6 4"/>
+  <circle cx="76" cy="121" r="20" fill="none" stroke="#E2E8F0" stroke-width="7"/>
+  <circle cx="76" cy="121" r="20" fill="none" stroke="#10B981" stroke-width="7" stroke-dasharray="32 100" stroke-linecap="round"/>
+  <text x="114" y="116" font-size="12.5" font-weight="700" fill="#0F172A">Graphique analytique en attente de données</text>
+  <text x="114" y="134" font-size="11.5" fill="#64748B">Importez des contacts d'exemple ou créez une fiche pour visualiser la répartition par catégorie avec Recharts.</text>
+  <rect x="1052" y="105" width="176" height="32" rx="7" fill="#0F172A"/>
+  <text x="1070" y="125" font-size="11.5" font-weight="600" fill="#FFFFFF">Charger les exemples B2B</text>
+
+  <!-- Main Vector Empty State Card -->
+  <rect x="32" y="180" width="1216" height="480" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+
+  <!-- Bespoke Vector Illustration of Contact Cards -->
+  <g transform="translate(560, 215)">
+    <rect x="28" y="14" width="104" height="68" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <rect x="18" y="28" width="112" height="72" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <circle cx="44" cy="56" r="14" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+    <circle cx="44" cy="52" r="4.5" fill="#059669"/>
+    <path d="M36 64C37.5 60.5 40.5 59 44 59C47.5 59 50.5 60.5 52 64" stroke="#059669" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="66" y="45" width="48" height="6" rx="3" fill="#1E293B"/>
+    <rect x="66" y="56" width="36" height="5" rx="2.5" fill="#059669"/>
+    <rect x="66" y="67" width="52" height="4" rx="2" fill="#E2E8F0"/>
+    <circle cx="130" cy="32" r="13" fill="#0F172A"/>
+    <path d="M130 26.5V37.5M124.5 32H135.5" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+
+  <text x="640" y="362" text-anchor="middle" font-size="18" font-weight="700" fill="#0F172A">Votre répertoire de contacts est actuellement vide</text>
+  <text x="640" y="388" text-anchor="middle" font-size="12.5" fill="#64748B">Démarrez immédiatement en chargeant le jeu d'exemples professionnels (organisations, coordonnées vérifiées, étiquettes et favoris)</text>
+  <text x="640" y="406" text-anchor="middle" font-size="12.5" fill="#64748B">ou créez votre première fiche contact.</text>
+
+  <!-- Quick Action Buttons -->
+  <rect x="290" y="432" width="265" height="38" rx="8" fill="#0F172A"/>
+  <text x="315" y="455" font-size="12" font-weight="600" fill="#FFFFFF">✨ Importer des contacts d'exemple (1 clic)</text>
+
+  <rect x="570" y="432" width="195" height="38" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="594" y="455" font-size="12" font-weight="600" fill="#0F172A">+ Créer un premier contact</text>
+
+  <rect x="780" y="432" width="215" height="38" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="802" y="455" font-size="12" font-weight="500" fill="#475569">Importer un fichier CSV / JSON</text>
+
+  <!-- 3 Feature Highlights -->
+  <line x1="220" y1="500" x2="1060" y2="500" stroke="#F1F5F9" stroke-width="1.5"/>
+
+  <rect x="220" y="520" width="265" height="74" rx="8" fill="#F8FAFC"/>
+  <text x="236" y="544" font-size="12" font-weight="700" fill="#1E293B">Coordonnées vérifiées</text>
+  <text x="236" y="564" font-size="11" fill="#64748B">Emails contrôlés et numéros de téléphone</text>
+  <text x="236" y="580" font-size="11" fill="#64748B">formatés automatiquement.</text>
+
+  <rect x="507" y="520" width="265" height="74" rx="8" fill="#F8FAFC"/>
+  <text x="523" y="544" font-size="12" font-weight="700" fill="#1E293B">Détection des doublons</text>
+  <text x="523" y="564" font-size="11" fill="#64748B">Repérage automatique des fiches similaires</text>
+  <text x="523" y="580" font-size="11" fill="#64748B">et fusion en un clic.</text>
+
+  <rect x="795" y="520" width="265" height="74" rx="8" fill="#F8FAFC"/>
+  <text x="811" y="544" font-size="12" font-weight="700" fill="#1E293B">Import &amp; Export rapide</text>
+  <text x="811" y="564" font-size="11" fill="#64748B">Échangez facilement vos listes de contacts</text>
+  <text x="811" y="580" font-size="11" fill="#64748B">aux formats CSV, JSON et vCard.</text>
+
+  <!-- Clean Footer -->
+  <rect x="0" y="684" width="1280" height="36" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="32" y="706" font-size="11.5" fill="#64748B">
+    <tspan font-weight="700" fill="#0F172A">Veridian Contacts</tspan> · Projet conçu et réalisé de bout en bout par <tspan font-weight="700" fill="#0F172A">Mendel Temgoua</tspan>
+  </text>
+</svg>

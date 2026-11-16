@@ -40,6 +40,8 @@ Liste, recherche et filtre les contacts.
 curl "http://localhost:3000/api/contacts?q=0614283950&searchMode=exact&searchField=phone"
 ```
 
+> **Conformité & Audit des Recherches (`SEARCH_CONTACTS`)** : Toute requête `GET /api/contacts` comportant un paramètre `q` d'au moins 2 caractères génère automatiquement une entrée `SEARCH_CONTACTS` dans le journal d'audit (`GET /api/audit`) avec les métadonnées `{ query, searchMode, searchField, category, resultsCount }`.
+
 ---
 
 ### `POST /api/contacts`

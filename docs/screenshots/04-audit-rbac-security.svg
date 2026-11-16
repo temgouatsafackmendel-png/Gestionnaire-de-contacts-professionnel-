@@ -1,62 +1,100 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" width="100%" height="100%" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
-  <rect width="1200" height="540" rx="12" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760" width="1280" height="760" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <rect width="1280" height="760" fill="#F8FAFC"/>
 
-  <!-- RBAC Banner -->
-  <rect x="28" y="24" width="1144" height="92" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
-  <text x="48" y="54" font-size="16" font-weight="700" fill="#0F172A">🛡 Contrôle d'accès basé sur les rôles (RBAC) &amp; Journal d'Audit</text>
-  <text x="48" y="76" font-size="12" fill="#64748B">Toutes les opérations sensibles (création, modification, suppression, fusion, import/export et refus 403) sont tracées.</text>
+  <!-- Top Bar -->
+  <rect x="0" y="0" width="1280" height="58" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="32" y="35" font-size="17" font-weight="700" fill="#0F172A">Veridian Contacts</text>
+  <text x="410" y="34" font-size="13" font-weight="500" fill="#64748B">Répertoire (10)</text>
+  <text x="535" y="34" font-size="13" font-weight="500" fill="#64748B">Doublons (2)</text>
+  <text x="645" y="34" font-size="13" font-weight="500" fill="#64748B">Import &amp; Export</text>
+  <text x="770" y="34" font-size="13" font-weight="600" fill="#0F172A">Journal d'Audit (24)</text>
+  <line x1="770" y1="46" x2="896" y2="46" stroke="#0F172A" stroke-width="2.5"/>
+  <rect x="1108" y="14" width="140" height="32" rx="7" fill="#0F172A"/>
+  <text x="1126" y="34" font-size="12" font-weight="600" fill="#FFFFFF">+ Nouveau Contact</text>
 
-  <!-- Role Switcher Pills -->
-  <rect x="650" y="42" width="500" height="38" rx="8" fill="#F1F5F9"/>
-  <rect x="654" y="46" width="142" height="30" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
-  <text x="670" y="65" font-size="11.5" font-weight="700" fill="#0F172A">Admin (Complet)</text>
-  <text x="812" y="65" font-size="11.5" font-weight="500" fill="#475569">Éditeur (Sans suppr.)</text>
-  <text x="965" y="65" font-size="11.5" font-weight="500" fill="#475569">Lecteur (Consultation)</text>
+  <!-- Top Cards: Profile & Search History Compliance -->
+  <rect x="32" y="82" width="596" height="148" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="56" y="112" font-size="15" font-weight="700" fill="#0F172A">Conformité &amp; Profils d'utilisation</text>
+  <text x="56" y="134" font-size="12" fill="#64748B">Consultez l'historique des actions et des recherches effectuées sur le carnet de contacts.</text>
+  <text x="56" y="176" font-size="12" font-weight="600" fill="#475569">Profil actif :</text>
+  <rect x="140" y="156" width="340" height="34" rx="7" fill="#F1F5F9"/>
+  <rect x="144" y="160" width="114" height="26" rx="5" fill="#FFFFFF"/>
+  <text x="158" y="177" font-size="11.5" font-weight="600" fill="#0F172A">Administrateur</text>
+  <text x="284" y="177" font-size="11.5" font-weight="500" fill="#64748B">Éditeur</text>
+  <text x="372" y="177" font-size="11.5" font-weight="500" fill="#64748B">Lecteur seul</text>
 
-  <!-- Audit Log Table -->
-  <rect x="28" y="136" width="1144" height="378" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
-  <text x="48" y="168" font-size="14" font-weight="700" fill="#0F172A">Événements d'audit enregistrés (Journal immuable SQLite)</text>
-  <rect x="920" y="148" width="230" height="30" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
-  <text x="935" y="167" font-size="11.5" fill="#0F172A">Toutes les actions                 ▾</text>
+  <!-- Right Card: Search Activity History -->
+  <rect x="652" y="82" width="596" height="148" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="676" y="112" font-size="15" font-weight="700" fill="#0F172A">Historique des recherches (6)</text>
+  <rect x="1082" y="92" width="144" height="28" rx="6" fill="#0F172A"/>
+  <text x="1096" y="110" font-size="11" font-weight="600" fill="#FFFFFF">Filtrer les recherches</text>
+  <text x="676" y="134" font-size="12" fill="#64748B">Suivi de conformité et d'usage des requêtes de recherche exécutées dans l'annuaire.</text>
 
-  <line x1="28" y1="190" x2="1172" y2="190" stroke="#E2E8F0"/>
-  <text x="48" y="214" font-size="11.5" font-weight="600" fill="#64748B">Horodatage UTC</text>
-  <text x="250" y="214" font-size="11.5" font-weight="600" fill="#64748B">Rôle</text>
-  <text x="370" y="214" font-size="11.5" font-weight="600" fill="#64748B">Action</text>
-  <text x="580" y="214" font-size="11.5" font-weight="600" fill="#64748B">Détail de l'opération</text>
-  <line x1="28" y1="226" x2="1172" y2="226" stroke="#E2E8F0"/>
+  <!-- Recent Search Query Chips (1-click replay) -->
+  <rect x="676" y="154" width="124" height="30" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="690" y="173" font-size="11.5" font-weight="600" fill="#0F172A">🔍 Moreau (2)</text>
 
-  <!-- Log Entry 1 -->
-  <text x="48" y="256" font-family="monospace" font-size="12" fill="#64748B">2026-11-16 21:24:12</text>
-  <text x="250" y="256" font-family="monospace" font-size="12" fill="#334155">viewer</text>
-  <text x="370" y="256" font-family="monospace" font-size="12" font-weight="700" fill="#B91C1C">PERMISSION_DENIED</text>
-  <text x="580" y="256" font-size="12" fill="#0F172A">Accès refusé (viewer) pour l'opération : Suppression de contact</text>
-  <line x1="28" y1="276" x2="1172" y2="276" stroke="#F1F5F9"/>
+  <rect x="810" y="154" width="142" height="30" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="824" y="173" font-size="11.5" font-weight="600" fill="#0F172A">🔍 Genève (1)</text>
 
-  <!-- Log Entry 2 -->
-  <text x="48" y="306" font-family="monospace" font-size="12" fill="#64748B">2026-11-16 21:22:48</text>
-  <text x="250" y="306" font-family="monospace" font-size="12" fill="#334155">editor</text>
-  <text x="370" y="306" font-family="monospace" font-size="12" font-weight="700" fill="#0F172A">IMPORT_CONTACTS</text>
-  <text x="580" y="306" font-size="12" fill="#0F172A">Import CSV : 1 créés, 0 mis à jour, 1 doublons ignorés, 2 lignes invalides rejetées.</text>
-  <line x1="28" y1="326" x2="1172" y2="326" stroke="#F1F5F9"/>
+  <rect x="962" y="154" width="136" height="30" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="976" y="173" font-size="11.5" font-weight="600" fill="#0F172A">🔍 biotech (2)</text>
 
-  <!-- Log Entry 3 -->
-  <text x="48" y="356" font-family="monospace" font-size="12" fill="#64748B">2026-11-16 21:20:05</text>
-  <text x="250" y="356" font-family="monospace" font-size="12" fill="#334155">admin</text>
-  <text x="370" y="356" font-family="monospace" font-size="12" font-weight="700" fill="#047857">MERGE_CONTACTS</text>
-  <text x="580" y="356" font-size="12" fill="#0F172A">Doublon fusionné : Thomas Lefevre absorbé dans Thomas Lefèvre (+33645781233)</text>
-  <line x1="28" y1="376" x2="1172" y2="376" stroke="#F1F5F9"/>
+  <rect x="1108" y="154" width="118" height="30" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="1122" y="173" font-size="11.5" font-weight="600" fill="#0F172A">🔍 +33 6 (6)</text>
 
-  <!-- Log Entry 4 -->
-  <text x="48" y="406" font-family="monospace" font-size="12" fill="#64748B">2026-11-16 21:18:30</text>
-  <text x="250" y="406" font-family="monospace" font-size="12" fill="#334155">admin</text>
-  <text x="370" y="406" font-family="monospace" font-size="12" font-weight="700" fill="#0F172A">EXPORT_CONTACTS</text>
-  <text x="580" y="406" font-size="12" fill="#0F172A">Export CSV généré (10 contacts) — encodage UTF-8 BOM &amp; protection formules.</text>
-  <line x1="28" y1="426" x2="1172" y2="426" stroke="#F1F5F9"/>
+  <!-- Main Audit Activity Table -->
+  <rect x="32" y="250" width="1216" height="450" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="56" y="282" font-size="14" font-weight="700" fill="#0F172A">Journal d'activité (24)</text>
 
-  <!-- Log Entry 5 -->
-  <text x="48" y="456" font-family="monospace" font-size="12" fill="#64748B">2026-11-16 21:16:18</text>
-  <text x="250" y="456" font-family="monospace" font-size="12" fill="#334155">admin</text>
-  <text x="370" y="456" font-family="monospace" font-size="12" font-weight="700" fill="#0F172A">BACKUP_RESTORE</text>
-  <text x="580" y="456" font-size="12" fill="#0F172A">Sauvegarde synchronisée SQLite WAL + Miroir JSON vérifiée avec succès.</text>
+  <rect x="750" y="262" width="220" height="30" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="766" y="281" font-size="11.5" fill="#94A3B8">🔍 Rechercher dans le journal...</text>
+
+  <text x="986" y="281" font-size="11.5" fill="#64748B">Catégorie :</text>
+  <rect x="1052" y="262" width="174" height="30" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="1066" y="281" font-size="11.5" font-weight="500" fill="#0F172A">Toutes les activités ▾</text>
+
+  <line x1="32" y1="304" x2="1248" y2="304" stroke="#E2E8F0"/>
+  <rect x="33" y="305" width="1214" height="34" fill="#F8FAFC"/>
+  <text x="56" y="326" font-size="11" font-weight="600" fill="#64748B">Date &amp; Heure</text>
+  <text x="250" y="326" font-size="11" font-weight="600" fill="#64748B">Profil</text>
+  <text x="420" y="326" font-size="11" font-weight="600" fill="#64748B">Type d'activité</text>
+  <text x="640" y="326" font-size="11" font-weight="600" fill="#64748B">Description</text>
+
+  <!-- Audit Entries -->
+  <line x1="32" y1="340" x2="1248" y2="340" stroke="#E2E8F0"/>
+  <text x="56" y="366" font-family="'JetBrains Mono', monospace" font-size="11.5" fill="#64748B">2026-11-16 22:58:14</text>
+  <text x="250" y="366" font-size="12" fill="#334155">Administrateur</text>
+  <text x="420" y="366" font-size="12" font-weight="600" fill="#059669">Recherche répertoire</text>
+  <text x="640" y="366" font-size="12" fill="#0F172A">Recherche partielle « Moreau » (2 résultats)</text>
+
+  <line x1="32" y1="386" x2="1248" y2="386" stroke="#E2E8F0"/>
+  <text x="56" y="412" font-family="'JetBrains Mono', monospace" font-size="11.5" fill="#64748B">2026-11-16 22:56:40</text>
+  <text x="250" y="412" font-size="12" fill="#334155">Éditeur</text>
+  <text x="420" y="412" font-size="12" font-weight="600" fill="#059669">Recherche répertoire</text>
+  <text x="640" y="412" font-size="12" fill="#0F172A">Recherche exacte « a.kovacs@geneva-biotech.ch » (1 résultat)</text>
+
+  <line x1="32" y1="432" x2="1248" y2="432" stroke="#E2E8F0"/>
+  <text x="56" y="458" font-family="'JetBrains Mono', monospace" font-size="11.5" fill="#64748B">2026-11-16 22:52:19</text>
+  <text x="250" y="458" font-size="12" fill="#334155">Administrateur</text>
+  <text x="420" y="458" font-size="12" font-weight="600" fill="#0F172A">Fusion de doublons</text>
+  <text x="640" y="458" font-size="12" fill="#0F172A">Fusion de la fiche secondaire dans Thomas Lefèvre (Nordic Supply Group)</text>
+
+  <line x1="32" y1="478" x2="1248" y2="478" stroke="#E2E8F0"/>
+  <text x="56" y="504" font-family="'JetBrains Mono', monospace" font-size="11.5" fill="#64748B">2026-11-16 22:48:03</text>
+  <text x="250" y="504" font-size="12" fill="#334155">Administrateur</text>
+  <text x="420" y="504" font-size="12" font-weight="600" fill="#0F172A">Importation de données</text>
+  <text x="640" y="504" font-size="12" fill="#0F172A">Import CSV exécuté : 4 créés, 0 mis à jour, 0 rejeté</text>
+
+  <line x1="32" y1="524" x2="1248" y2="524" stroke="#E2E8F0"/>
+  <text x="56" y="550" font-family="'JetBrains Mono', monospace" font-size="11.5" fill="#64748B">2026-11-16 22:41:11</text>
+  <text x="250" y="550" font-size="12" fill="#334155">Lecteur</text>
+  <text x="420" y="550" font-size="12" font-weight="600" fill="#B91C1C">Action non autorisée</text>
+  <text x="640" y="550" font-size="12" fill="#B91C1C">Accès refusé (viewer) pour l'opération : Suppression de contact</text>
+
+  <!-- Clean Footer -->
+  <rect x="0" y="724" width="1280" height="36" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="32" y="746" font-size="11.5" fill="#64748B">
+    <tspan font-weight="700" fill="#0F172A">Veridian Contacts</tspan> · Projet conçu et réalisé de bout en bout par <tspan font-weight="700" fill="#0F172A">Mendel Temgoua</tspan>
+  </text>
 </svg>

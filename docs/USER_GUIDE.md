@@ -1,80 +1,80 @@
-# Guide Utilisateur Visuel — Veridian Contacts
+# Guide Utilisateur Illustré de Bout en Bout — Veridian Contacts
 
-Ce guide présente pas à pas les fonctionnalités de **Veridian Contacts** avec des captures d'écran de l'interface.
+> **Auteur** : Projet conçu, architecturé et réalisé de bout en bout par **Mendel Temgoua** (`mendeltemgouabusiness@gmail.com`).
 
----
-
-## 1. Espace de Travail Principal, Recherche Exacte/Partielle & Fiche Détail
-
-![Espace de travail principal et Répertoire](./screenshots/01-directory-workspace.svg)
-
-### A. Bandeau de Pilotage (Indicateurs Clés)
-En haut de l'espace de travail, quatre cartes interactives vous permettent de piloter votre carnet en un clic :
-1. **Contacts enregistrés** : Affiche le volume total, le nombre d'organisations et de pays. Cliquez dessus pour réinitialiser tous les filtres.
-2. **Contacts favoris & VIP** : Cliquez pour afficher uniquement vos contacts stratégiques marqués d'une étoile `★`.
-3. **Doublons détectés** : Affiche en temps réel le nombre de paires de doublons identifiées et ouvre l'assistant de fusion.
-4. **Sauvegarde & Flux CSV/JSON** : Indique le statut d'intégrité (`PRAGMA integrity_check: OK`) de la base SQLite WAL et du miroir JSON atomique.
-
-### B. Recherche Exacte vs Recherche Partielle
-- **Mode Partielle (Contient)** : Recherche multi-mots insensible à la casse et aux accents sur l'ensemble des champs (ou un champ ciblé). Par exemple, saisir `Moreau Paris` ou `biotech` filtre instantanément les fiches correspondantes.
-- **Mode Exacte (Stricte)** : Exige une correspondance exacte sur le champ ciblé.
-  - *Astuce Téléphone E.164* : Même si la fiche est enregistrée sous `+33 6 14 28 39 50`, une recherche exacte sur `0614283950` aboutit grâce à la normalisation canonique `+33614283950`.
-
-### C. Modes d'affichage (Tableau / Cartes) & Index Alphabétique A–Z
-- Basculez entre la **Vue Tableau** (idéale pour le tri, la sélection multiple et le traitement par lot) et la **Vue Cartes** (cartes de visite avec avatars d'initiales).
-- Utilisez la barre **A–Z Tous** pour filtrer par la première lettre du nom de famille.
-
-### D. Panneau Latéral d'Inspection & Export vCard (`.vcf`)
-En cliquant sur n'importe quel contact :
-- Copiez l'adresse email ou le numéro E.164 en un clic avec confirmation visuelle (`Copié !`).
-- Téléchargez la **Fiche vCard (`.vcf`)** compatible Apple Contacts, Google Contacts et Microsoft Outlook.
-- Ajoutez ou retirez des étiquettes (`#vip`, `#prioritaire`) directement à la volée.
+Ce guide présente pas à pas l'ensemble des parcours fonctionnels de **Veridian Contacts** à travers les captures d'écran de l'application.
 
 ---
 
-## 2. Détection des Doublons & Assistant de Fusion ACID
+## 1. Répertoire Principal, Graphique en Anneau Recharts & Fiche Détail
 
-![Assistant de déduplication et fusion ACID](./screenshots/02-duplicate-merge-wizard.svg)
+![Répertoire Principal et Graphique en Anneau Recharts](./screenshots/01-directory-workspace.svg)
 
-Le moteur de déduplication analyse quatre niveaux de correspondance :
-1. **Email exact** (score 100 %)
-2. **Téléphone normalisé E.164 identique** (ex. `06 45 78 12 33` et `+33 6 45 78 12 33` $\rightarrow$ `+33645781233`, score 95 %)
-3. **Homonymie Prénom + Nom (+ Entreprise)** (score 82 % à 90 %)
-4. **Inversion Prénom/Nom ou proximité orthographique (Distance de Levenshtein = 1)** (score 75 % à 78 %)
+### A. Bandeau d'Indicateurs Clés (KPI)
+Quatre cartes synthétiques en haut de l'interface permettent de piloter votre carnet en un clic :
+1. **Contacts enregistrés** : Affiche le nombre total de contacts, d'organisations et de pays représentés. Cliquez dessus pour réinitialiser tous les filtres actifs.
+2. **Contacts favoris & VIP** : Filtre instantanément vos contacts prioritaires marqués d'une étoile `★`.
+3. **Doublons détectés** : Indique le nombre de paires de doublons identifiées et ouvre directement l'assistant de fusion.
+4. **Import & Export (`CSV · JSON · vCard`)** : Accède en un clic au centre d'importation et d'exportation.
 
-### Comment fusionner deux fiches en doublon :
-1. Sélectionnez la paire à gauche dans la liste **Paires à examiner**.
-2. Dans le tableau comparatif de droite, cliquez sur chaque valeur que vous souhaitez conserver entre la **Fiche A** et la **Fiche B**.
-3. Vérifiez l'encadré **Aperçu du résultat après fusion** en bas : les étiquettes et les notes des deux fiches sont automatiquement combinées sans perte d'information.
-4. Cliquez sur **Valider et Fusionner ces 2 fiches** (ou sur **Tout fusionner automatiquement** pour traiter tout le lot en un clic).
+### B. Graphique en Anneau Interactif (Recharts) par Catégorie
+Situé dans l'en-tête du répertoire :
+- **Inspection au survol (Hover)** : Survolez n'importe quelle tranche de l'anneau ou l'une des 6 cartes de catégories (*Clients*, *Partenaires*, *Fournisseurs*, *Prospects*, *Internes*, *Autres*) pour afficher une infobulle avec le nombre exact de fiches et le pourcentage correspondant.
+- **Filtrage au clic** : Cliquez sur un segment de l'anneau ou sur une carte de catégorie pour filtrer immédiatement le répertoire. Cliquez à nouveau pour revenir à la vue complète.
 
----
-
-## 3. Import / Export CSV & JSON et Signalement des Lignes Invalides
-
-![Import CSV/JSON et rapport d'erreurs ligne par ligne](./screenshots/03-import-validation-report.svg)
-
-### A. Vérification et Signalement des Lignes Invalides
-1. Ouvrez l'onglet **Import & Export**.
-2. Chargez votre fichier `.csv` ou `.json` (ou cliquez sur le bouton **« Jeu d'essai CSV avec erreurs (Démo QA) »** pour tester immédiatement le contrôle qualité).
-3. Choisissez la politique de gestion des doublons :
-   - *Ignorer les doublons et les signaler dans le rapport* (`skip`)
-   - *Mettre à jour la fiche existante correspondante* (`update`)
-   - *Importer malgré tout comme nouvelle fiche* (`create_anyway`)
-4. Cliquez sur **Simuler & Vérifier les erreurs (Dry-Run)** pour tester sans modifier la base, ou sur **Exécuter l'importation des lignes valides**.
-5. Le rapport affiche :
-   - Le nombre exact de lignes analysées, créées, mises à jour, ignorées ou rejetées.
-   - Le tableau détaillé des **lignes invalides avec leur numéro de ligne exact** (ex. `Ligne 3`, `Ligne 4`) et le message d'erreur précis par champ (`email`, `phone`, `firstName`).
-   - Un bouton pour télécharger le rapport d'anomalies au format `.json`.
+### C. Recherche Instantanée (Partielle vs Exacte), Vues Multiples & Panneau Détail
+- **Mode Partielle (Contient)** : Recherche multi-mots insensible aux accents sur tous les champs ou un champ ciblé (*Nom*, *Email*, *Téléphone*, *Entreprise*).
+- **Mode Exacte (Stricte)** : Recherche une correspondance stricte (y compris sur les numéros de téléphone quel que soit leur format de saisie grâce à la normalisation internationale).
+- **3 Modes d'affichage** : Basculez entre **Tableau**, **Cartes** et **Organisations** (regroupement par société), complétés par l'**Index Alphabétique A–Z**.
+- **Panneau Détail Épuré** : Cliquez sur un contact pour copier son email ou son téléphone en 1 clic, télécharger sa **Fiche vCard (`.vcf`)**, modifier sa catégorie ou enregistrer une note métier à la volée.
 
 ---
 
-## 4. Contrôle d'Accès (RBAC) & Journal d'Audit
+## 2. États Vides Vectoriels & Importation d'Exemples en 1 Clic
 
-![Contrôle d'accès RBAC et Journal d'Audit](./screenshots/04-audit-rbac-security.svg)
+![État Vide Vectoriel et Import d'Exemples en 1 Clic](./screenshots/05-empty-state-quick-import.svg)
 
-- **Sélecteur de Rôle RBAC** : Situé dans la barre d'outils supérieure et dans l'onglet **Journal d'Audit**, il permet de basculer entre :
-  - `admin` : Tous les droits (CRUD, import/export, fusion, suppression, réinitialisation).
-  - `editor` : Création, modification, import/export et fusion, **sans droit de suppression**.
-  - `viewer` : Consultation, recherche et export uniquement.
-- Toute tentative d'action non autorisée renvoie une erreur `403 Forbidden` et génère immédiatement une entrée `PERMISSION_DENIED` dans le **Journal d'Audit**.
+Lorsque le carnet de contacts est vide ou qu'une combinaison de filtres ne retourne aucun résultat :
+- Une **illustration vectorielle SVG sur mesure** s'affiche à la place d'un simple texte vide.
+- Si la base est vide, le bouton **« Importer des contacts d'exemple (1 clic) »** (ainsi que le bouton **« Charger les exemples B2B »** dans l'en-tête du graphique) permet d'injecter immédiatement un jeu complet de contacts professionnels pré-validés.
+- Si une recherche en mode *Exacte* ne donne aucun résultat, un bouton contextuel propose de **« Passer en Recherche Partielle (Contient) »** ou de **« Réinitialiser tous les filtres »**.
+
+---
+
+## 3. Détection des Doublons & Assistant de Fusion Côte à Côte
+
+![Assistant de Déduplication et Fusion Côte à Côte](./screenshots/02-duplicate-merge-wizard.svg)
+
+L'application repère automatiquement :
+1. Les **adresses email identiques** (score 100 %).
+2. Les **numéros de téléphone identiques** même saisis sous des formats différents (`06 45 78 12 33` vs `+33 6 45 78 12 33`, score 95 %).
+3. Les **homonymes Prénom + Nom** au sein d'une même entreprise (score 90 %).
+4. Les **inversions Prénom/Nom** et les fautes de frappe mineures (distance de Levenshtein = 1).
+
+### Fusionner deux fiches :
+1. Sélectionnez la paire à examiner dans la colonne de gauche.
+2. Choisissez champ par champ la valeur à conserver entre la **Fiche A** et la **Fiche B**.
+3. Vérifiez l'**Aperçu du résultat après fusion** (les étiquettes et notes des deux fiches sont automatiquement réunies).
+4. Cliquez sur **Valider et Fusionner ces 2 fiches** ou utilisez **Tout fusionner automatiquement**.
+
+---
+
+## 4. Import / Export CSV & JSON et Signalement des Lignes Invalides
+
+![Import CSV/JSON et Rapport d'Erreurs Ligne par Ligne](./screenshots/03-import-validation-report.svg)
+
+1. Rendez-vous dans l'onglet **Import & Export**.
+2. Chargez un fichier `.csv` ou `.json` depuis votre ordinateur ou utilisez l'un des **3 jeux d'essai préconfigurés** (*CSV avec erreurs*, *CSV 100% valide*, *JSON mixte*).
+3. Cliquez sur **Simuler & Vérifier les erreurs (Dry-Run)** ou sur **Exécuter l'importation des lignes valides**.
+4. Le rapport détaille chaque ligne rejetée avec son **numéro de ligne exact** (`Ligne 3`, `Ligne 4`) et l'explication précise de l'anomalie, tout en permettant d'exporter le rapport d'erreurs en `.json`.
+
+---
+
+## 5. Journal d'Activité, Historique des Recherches & Profils d'Accès
+
+![Journal d'Activité et Historique de Conformité des Recherches](./screenshots/04-audit-rbac-security.svg)
+
+- **Historique de conformité des recherches** : Chaque recherche effectuée dans le répertoire est enregistrée dans la carte **Historique des recherches** avec le terme recherché et le nombre de résultats obtenus.
+  - Cliquez sur **« Filtrer les recherches »** pour n'afficher que l'historique des recherches dans le tableau.
+  - Cliquez directement sur l'un des badges de recherche récente (ex. `🔍 Moreau (2)`) pour **relancer instantanément cette recherche** dans le répertoire.
+- **Gestion des profils d'utilisation** : Basculez à tout moment entre **Administrateur** (tous les droits), **Éditeur** (création, modification, import/export et fusion, sans suppression) et **Lecteur seul** (consultation et export).

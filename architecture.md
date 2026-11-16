@@ -1,5 +1,7 @@
 # Architecture Logicielle — Veridian Contacts
 
+> **Auteur & Architecte** : Projet conçu, architecturé et réalisé **de bout en bout par Mendel Temgoua** (`mendeltemgouabusiness@gmail.com`).
+
 ## 1. Vue d'ensemble et Justification de la Stack Technique
 
 Bien que la stack indicative mentionnait `Python, SQLite ou JSON, pytest`, ce produit est réalisé avec une architecture **Full-Stack TypeScript unifiée (Node.js + Express + SQLite `better-sqlite3` en mode WAL + Miroir atomique JSON + React 19 + Tailwind CSS v4 + Zod + Vitest & Supertest)** pour les raisons architecturales suivantes :

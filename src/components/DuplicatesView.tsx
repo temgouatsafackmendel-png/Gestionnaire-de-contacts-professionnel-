@@ -107,8 +107,64 @@ export const DuplicatesView: React.FC<DuplicatesViewProps> = ({
             {feedback}
           </div>
         )}
-        <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600 dark:text-emerald-400" />
-        <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+        <div className="mx-auto mb-4 flex h-24 w-32 items-center justify-center">
+          <svg
+            viewBox="0 0 140 100"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-full w-full"
+            aria-hidden="true"
+          >
+            <rect
+              x="22"
+              y="18"
+              width="76"
+              height="56"
+              rx="8"
+              className="fill-slate-50 stroke-slate-300 dark:fill-slate-800/60 dark:stroke-slate-700"
+              strokeWidth="1.5"
+            />
+            <rect
+              x="34"
+              y="30"
+              width="42"
+              height="5"
+              rx="2.5"
+              className="fill-slate-700 dark:fill-slate-300"
+            />
+            <rect
+              x="34"
+              y="41"
+              width="52"
+              height="4"
+              rx="2"
+              className="fill-slate-300 dark:fill-slate-600"
+            />
+            <rect
+              x="34"
+              y="51"
+              width="34"
+              height="4"
+              rx="2"
+              className="fill-slate-200 dark:fill-slate-700"
+            />
+            <circle
+              cx="98"
+              cy="60"
+              r="18"
+              className="fill-emerald-50 stroke-emerald-600 dark:fill-emerald-950 dark:stroke-emerald-400"
+              strokeWidth="2"
+            />
+            <path
+              d="M91 60.5L96 65.5L106 55.5"
+              className="stroke-emerald-600 dark:stroke-emerald-400"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
           Aucun doublon détecté — Votre répertoire est 100 % intègre
         </h2>
         <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600 dark:text-slate-400">

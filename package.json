@@ -1,8 +1,9 @@
 {
   "name": "veridian-contacts",
   "private": true,
-  "version": "1.0.0",
-  "description": "Gestionnaire de contacts professionnel full-stack avec validation RFC 5322 / E.164, recherche exacte et partielle, détection et fusion ACID de doublons, import/export CSV/JSON et journal d'audit RBAC.",
+  "version": "1.1.0",
+  "author": "Mendel Temgoua <mendeltemgouabusiness@gmail.com>",
+  "description": "Gestionnaire de contacts professionnel full-stack conçu et réalisé de bout en bout par Mendel Temgoua — validation RFC 5322 / E.164, recherche exacte et partielle, graphique analytique Recharts, détection et fusion ACID de doublons, import/export CSV/JSON et journal d'audit RBAC.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -27,6 +28,7 @@
     "motion": "^12.23.24",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
+    "recharts": "^3.10.1",
     "supertest": "^7.3.2",
     "vite": "^8.3.0",
     "vitest": "^5.1.0",

@@ -112,11 +112,44 @@ export function createApiApp(repo: ContactRepository, options?: { maxRequestsPer
     }
   );
 
+  // Track recent search signature to avoid duplicate audit logs on background refreshes
+  let lastLoggedSearchSignature = '';
+  let lastLoggedSearchAt = 0;
+
   // List & Search contacts
   app.get('/api/contacts', (req: Request, res: Response) => {
+    const role = resolveActorRole(req);
     const filters = extractFiltersFromQuery(req.query);
     const contacts = repo.queryContacts(filters);
     const duplicates = repo.getDuplicates();
+
+    const trimmedQuery = filters.q?.trim();
+    if (trimmedQuery && trimmedQuery.length >= 2) {
+      const modeLabel =
+        filters.searchMode === SearchMode.EXACT ? 'exacte' : 'partielle';
+      const fieldLabel = filters.searchField || SearchField.ALL;
+      const signature = `${role}:${trimmedQuery.toLowerCase()}:${filters.searchMode}:${fieldLabel}:${filters.category || 'all'}`;
+      const now = Date.now();
+
+      if (signature !== lastLoggedSearchSignature || now - lastLoggedSearchAt > 15_000) {
+        lastLoggedSearchSignature = signature;
+        lastLoggedSearchAt = now;
+        repo.recordAudit(
+          role,
+          'SEARCH_CONTACTS',
+          null,
+          `Recherche ${modeLabel} « ${trimmedQuery} » (${contacts.length} résultat${contacts.length > 1 ? 's' : ''})`,
+          {
+            query: trimmedQuery,
+            searchMode: filters.searchMode || SearchMode.PARTIAL,
+            searchField: fieldLabel,
+            category: filters.category || 'all',
+            resultsCount: contacts.length,
+          }
+        );
+      }
+    }
+
     res.json({
       contacts,
       totalCount: contacts.length,

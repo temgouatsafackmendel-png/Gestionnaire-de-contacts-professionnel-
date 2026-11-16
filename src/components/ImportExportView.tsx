@@ -220,18 +220,18 @@ export const ImportExportView: React.FC<ImportExportViewProps> = ({
         </div>
       )}
 
-      {/* Top Row: Export & Storage Reliability */}
+      {/* Top Row: Export & Backup Management */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Export Card */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                Exportation multi-formats (CSV &amp; JSON)
+                Exportation du carnet (CSV &amp; JSON)
               </h2>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Export conforme RFC 4180 (UTF-8 avec BOM Excel, protection anti-injection de formules{' '}
-                <code className="font-mono">= + - @</code>) avec téléchargement et aperçu direct.
+                Téléchargez l&apos;intégralité de vos contacts ou uniquement votre sélection filtrée
+                pour Excel, Google Contacts ou vos outils CRM.
               </p>
             </div>
             <FileSpreadsheet className="h-5 w-5 shrink-0 text-slate-400" />
@@ -239,7 +239,7 @@ export const ImportExportView: React.FC<ImportExportViewProps> = ({
 
           <div className="mt-5 space-y-3 border-t border-slate-200 pt-4 text-xs dark:border-slate-800">
             <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
-              <span>Répertoire complet enregistré :</span>
+              <span>Total des contacts enregistrés :</span>
               <span className="font-mono font-semibold text-slate-900 tabular-nums dark:text-slate-100">
                 {totalContactsCount} contacts
               </span>
@@ -258,7 +258,7 @@ export const ImportExportView: React.FC<ImportExportViewProps> = ({
                 className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-medium whitespace-nowrap text-white transition-colors hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
               >
                 <Download className="h-3.5 w-3.5" />
-                <span>Exporter &amp; Voir CSV ({totalContactsCount})</span>
+                <span>Exporter en CSV ({totalContactsCount})</span>
               </button>
               <button
                 type="button"
@@ -266,7 +266,7 @@ export const ImportExportView: React.FC<ImportExportViewProps> = ({
                 className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium whitespace-nowrap text-slate-800 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 <Download className="h-3.5 w-3.5" />
-                <span>Exporter &amp; Voir JSON ({totalContactsCount})</span>
+                <span>Exporter en JSON ({totalContactsCount})</span>
               </button>
               {filteredContactsCount !== totalContactsCount && (
                 <button
@@ -282,15 +282,16 @@ export const ImportExportView: React.FC<ImportExportViewProps> = ({
           </div>
         </div>
 
-        {/* Reliable Persistence & Backup Card */}
+        {/* Clean User-Centric Backup & Sample Data Card */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                Sauvegarde fiable &amp; Intégrité ACID
+                Sauvegarde &amp; Données d&apos;exemple
               </h2>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Base SQLite en mode journalisé WAL doublée d&apos;un miroir atomique JSON sur disque.
+                Vos modifications sont sauvegardées automatiquement. Vous pouvez créer un point de
+                sauvegarde instantané ou recharger les contacts de démonstration.
               </p>
             </div>
             <Database className="h-5 w-5 shrink-0 text-slate-400" />
@@ -298,21 +299,17 @@ export const ImportExportView: React.FC<ImportExportViewProps> = ({
 
           <div className="mt-5 space-y-2.5 border-t border-slate-200 pt-4 text-xs dark:border-slate-800">
             <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
-              <span>Moteur de persistance :</span>
-              <span className="font-mono text-slate-900 dark:text-slate-100">
-                {storageStatus?.engine || 'sqlite+json-mirror'}
+              <span>État de la sauvegarde automatique :</span>
+              <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                {storageStatus?.integrityOk !== false ? 'Active et à jour' : 'Vérification requise'}
               </span>
             </div>
             <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
-              <span>Contrôle PRAGMA integrity_check :</span>
-              <span className="font-mono font-medium text-emerald-700 dark:text-emerald-400">
-                {storageStatus?.integrityOk !== false ? 'OK (Vérifié)' : 'Erreur détectée'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
-              <span>Fichier SQLite / Miroir JSON :</span>
-              <span className="font-mono text-slate-700 dark:text-slate-300">
-                {storageStatus?.dbPath} · {storageStatus?.backupPath}
+              <span>Dernière synchronisation :</span>
+              <span className="font-mono text-slate-700 tabular-nums dark:text-slate-300">
+                {storageStatus?.lastBackupAt
+                  ? storageStatus.lastBackupAt.replace('T', ' ').slice(0, 19)
+                  : 'Automatique'}
               </span>
             </div>
 
@@ -323,14 +320,14 @@ export const ImportExportView: React.FC<ImportExportViewProps> = ({
                 className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium whitespace-nowrap text-slate-800 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
-                <span>Vérifier &amp; Synchroniser la sauvegarde</span>
+                <span>Sauvegarder maintenant</span>
               </button>
               <button
                 type="button"
                 onClick={handleResetDemo}
                 className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium whitespace-nowrap text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
               >
-                <span>Réinitialiser le jeu de démo (10 contacts)</span>
+                <span>Restaurer les contacts d&apos;exemple (10 fiches)</span>
               </button>
             </div>
           </div>
