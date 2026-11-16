@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" width="100%" height="100%" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <!-- Background Canvas -->
+  <rect width="1200" height="720" rx="12" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- Top Bar Header -->
+  <rect x="2" y="2" width="1196" height="58" rx="10" fill="#FFFFFF"/>
+  <line x1="2" y1="60" x2="1198" y2="60" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="28" y="37" font-size="17" font-weight="700" fill="#0F172A">Veridian Contacts</text>
+
+  <!-- Navigation Tabs -->
+  <text x="360" y="36" font-size="13" font-weight="600" fill="#0F172A">Répertoire (10)</text>
+  <line x1="360" y1="50" x2="455" y2="50" stroke="#0F172A" stroke-width="2.5"/>
+  <text x="485" y="36" font-size="13" font-weight="500" fill="#64748B">Doublons (2)</text>
+  <text x="595" y="36" font-size="13" font-weight="500" fill="#64748B">Import &amp; Export</text>
+  <text x="725" y="36" font-size="13" font-weight="500" fill="#64748B">Journal d'Audit (14)</text>
+
+  <!-- Primary CTA -->
+  <rect x="1030" y="16" width="142" height="32" rx="7" fill="#0F172A"/>
+  <text x="1052" y="36" font-size="12" font-weight="600" fill="#FFFFFF">+ Nouveau Contact</text>
+
+  <!-- KPI Strip (4 Cards) -->
+  <!-- Card 1 -->
+  <rect x="28" y="78" width="272" height="82" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="44" y="102" font-size="11" font-weight="500" fill="#64748B">Contacts enregistrés</text>
+  <text x="44" y="130" font-family="monospace" font-size="22" font-weight="700" fill="#0F172A">10</text>
+  <text x="44" y="148" font-size="11" fill="#64748B">8 organisations · 3 pays</text>
+
+  <!-- Card 2 -->
+  <rect x="318" y="78" width="272" height="82" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="334" y="102" font-size="11" font-weight="500" fill="#64748B">Contacts favoris &amp; VIP</text>
+  <text x="334" y="130" font-family="monospace" font-size="22" font-weight="700" fill="#0F172A">4</text>
+  <text x="334" y="148" font-size="11" fill="#64748B">Cliquer pour filtrer les favoris</text>
+
+  <!-- Card 3 -->
+  <rect x="608" y="78" width="272" height="82" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="624" y="102" font-size="11" font-weight="500" fill="#64748B">Doublons détectés</text>
+  <text x="624" y="130" font-family="monospace" font-size="22" font-weight="700" fill="#0F172A">2</text>
+  <text x="624" y="148" font-size="11" font-weight="600" fill="#B45309">Examiner et fusionner en 1 clic →</text>
+
+  <!-- Card 4 -->
+  <rect x="898" y="78" width="274" height="82" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="914" y="102" font-size="11" font-weight="500" fill="#64748B">Sauvegarde &amp; Flux CSV/JSON</text>
+  <text x="914" y="128" font-family="monospace" font-size="16" font-weight="700" fill="#047857">Intégrité OK</text>
+  <text x="914" y="148" font-size="11" fill="#64748B">SQLite WAL + Miroir JSON atomique →</text>
+
+  <!-- Search & Filter Section -->
+  <rect x="28" y="176" width="1144" height="128" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="46" y="198" font-size="11" font-weight="600" fill="#334155">Recherche instantanée (nom, email, téléphone E.164, société, ville)</text>
+  <rect x="46" y="206" width="460" height="34" rx="7" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="64" y="227" font-size="12" fill="#64748B">🔍  Recherche partielle (ex. Moreau, +33 6, Genève, biotech)...</text>
+
+  <!-- Search Mode Toggle -->
+  <text x="526" y="198" font-size="11" font-weight="600" fill="#334155">Mode de correspondance</text>
+  <rect x="526" y="206" width="260" height="34" rx="7" fill="#F1F5F9"/>
+  <rect x="530" y="210" width="126" height="26" rx="5" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="546" y="227" font-size="11" font-weight="600" fill="#0F172A">Partielle (Contient)</text>
+  <text x="674" y="227" font-size="11" font-weight="500" fill="#64748B">Exacte (Stricte)</text>
+
+  <!-- Field & Sort Selectors -->
+  <text x="806" y="198" font-size="11" font-weight="600" fill="#334155">Champ ciblé</text>
+  <rect x="806" y="206" width="165" height="34" rx="7" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="820" y="227" font-size="11" fill="#0F172A">Tous les champs   ▾</text>
+
+  <text x="988" y="198" font-size="11" font-weight="600" fill="#334155">Tri du répertoire</text>
+  <rect x="988" y="206" width="166" height="34" rx="7" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="1002" y="227" font-size="11" fill="#0F172A">Nom (A → Z)          ▾</text>
+
+  <!-- Category Segmented Bar + Export Buttons -->
+  <line x1="46" y1="252" x2="1154" y2="252" stroke="#F1F5F9" stroke-width="1"/>
+  <rect x="46" y="262" width="490" height="30" rx="6" fill="#F1F5F9"/>
+  <rect x="50" y="265" width="70" height="24" rx="4" fill="#FFFFFF"/>
+  <text x="62" y="281" font-size="11" font-weight="600" fill="#0F172A">Tous (10)</text>
+  <text x="135" y="281" font-size="11" fill="#475569">Clients (2)</text>
+  <text x="215" y="281" font-size="11" fill="#475569">Partenaires (3)</text>
+  <text x="315" y="281" font-size="11" fill="#475569">Fournisseurs (2)</text>
+  <text x="420" y="281" font-size="11" fill="#475569">Prospects (2)</text>
+
+  <rect x="935" y="262" width="104" height="30" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="950" y="281" font-size="11" font-weight="600" fill="#334155">⬇ Exporter CSV</text>
+  <rect x="1048" y="262" width="106" height="30" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="1062" y="281" font-size="11" font-weight="600" fill="#334155">⬇ Exporter JSON</text>
+
+  <!-- Main Directory Table (Left 8 cols) -->
+  <rect x="28" y="320" width="750" height="372" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="29" y="321" width="748" height="38" rx="9" fill="#F8FAFC"/>
+  <text x="92" y="344" font-size="11" font-weight="600" fill="#64748B">Contact &amp; Fonction</text>
+  <text x="310" y="344" font-size="11" font-weight="600" fill="#64748B">Coordonnées (Email &amp; E.164)</text>
+  <text x="560" y="344" font-size="11" font-weight="600" fill="#64748B">Organisation &amp; Métadonnées</text>
+
+  <!-- Row 1 (Selected - Camille Moreau) -->
+  <rect x="29" y="360" width="748" height="66" fill="#F1F5F9"/>
+  <text x="52" y="398" font-size="14" fill="#F59E0B">★</text>
+  <rect x="78" y="375" width="34" height="34" rx="7" fill="#D1FAE5"/>
+  <text x="86" y="396" font-family="monospace" font-size="12" font-weight="700" fill="#065F46">CM</text>
+  <text x="122" y="390" font-size="13" font-weight="600" fill="#0F172A">Camille Moreau</text>
+  <text x="122" y="408" font-size="11" fill="#64748B">Directrice Produit</text>
+  <text x="310" y="390" font-family="monospace" font-size="11.5" fill="#0F172A">camille.moreau@atelier-veridian.fr</text>
+  <text x="310" y="408" font-family="monospace" font-size="11" fill="#64748B">+33 6 14 28 39 50 · +33614283950</text>
+  <text x="560" y="390" font-size="12" font-weight="600" fill="#1E293B">Atelier Veridian SAS</text>
+  <text x="560" y="408" font-size="11" fill="#64748B">Client · Paris · #vip #contrat-2026</text>
+
+  <!-- Row 2 (Élise Fontaine) -->
+  <line x1="29" y1="426" x2="777" y2="426" stroke="#E2E8F0"/>
+  <text x="52" y="464" font-size="14" fill="#F59E0B">★</text>
+  <rect x="78" y="441" width="34" height="34" rx="7" fill="#D1FAE5"/>
+  <text x="87" y="462" font-family="monospace" font-size="12" font-weight="700" fill="#065F46">EF</text>
+  <text x="122" y="456" font-size="13" font-weight="600" fill="#0F172A">Élise Fontaine</text>
+  <text x="122" y="474" font-size="11" fill="#64748B">Directrice R&amp;D</text>
+  <text x="310" y="456" font-family="monospace" font-size="11.5" fill="#0F172A">elise.fontaine@novacare-biotech.ch</text>
+  <text x="310" y="474" font-family="monospace" font-size="11" fill="#64748B">+41 22 819 44 10 · +41228194410</text>
+  <text x="560" y="456" font-size="12" font-weight="600" fill="#1E293B">NovaCare Biotech SA</text>
+  <text x="560" y="474" font-size="11" fill="#64748B">Client · Genève · #biotech #suisse</text>
+
+  <!-- Row 3 (Thomas Lefèvre - Duplicate warning) -->
+  <line x1="29" y1="492" x2="777" y2="492" stroke="#E2E8F0"/>
+  <text x="52" y="530" font-size="14" fill="#F59E0B">★</text>
+  <rect x="78" y="507" width="34" height="34" rx="7" fill="#E0F2FE"/>
+  <text x="87" y="528" font-family="monospace" font-size="12" font-weight="700" fill="#075985">TL</text>
+  <text x="122" y="522" font-size="13" font-weight="600" fill="#0F172A">Thomas Lefèvre</text>
+  <text x="122" y="540" font-size="11" fill="#B45309">Responsable Achats · Doublon détecté</text>
+  <text x="310" y="522" font-family="monospace" font-size="11.5" fill="#0F172A">t.lefevre@helios-logistics.eu</text>
+  <text x="310" y="540" font-family="monospace" font-size="11" fill="#64748B">06 45 78 12 33 · +33645781233</text>
+  <text x="560" y="522" font-size="12" font-weight="600" fill="#1E293B">Helios Logistics Europe</text>
+  <text x="560" y="540" font-size="11" fill="#64748B">Partenaire · Lyon · #logistique</text>
+
+  <!-- Row 4 (Marc Dubois) -->
+  <line x1="29" y1="558" x2="777" y2="558" stroke="#E2E8F0"/>
+  <text x="52" y="596" font-size="14" fill="#CBD5E1">★</text>
+  <rect x="78" y="573" width="34" height="34" rx="7" fill="#FEF3C7"/>
+  <text x="85" y="594" font-family="monospace" font-size="12" font-weight="700" fill="#92400E">MD</text>
+  <text x="122" y="588" font-size="13" font-weight="600" fill="#0F172A">Marc Dubois</text>
+  <text x="122" y="606" font-size="11" fill="#64748B">Architecte Sécurité</text>
+  <text x="310" y="588" font-family="monospace" font-size="11.5" fill="#0F172A">marc.dubois@krono-cloud.io</text>
+  <text x="310" y="606" font-family="monospace" font-size="11" fill="#64748B">+33 7 82 91 04 55 · +33782910455</text>
+  <text x="560" y="588" font-size="12" font-weight="600" fill="#1E293B">KronoCloud Infrastructure</text>
+  <text x="560" y="606" font-size="11" fill="#64748B">Fournisseur · Nantes · #cloud #soc2</text>
+
+  <!-- Right Contact Inspector Panel (4 cols) -->
+  <rect x="796" y="320" width="376" height="372" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="816" y="340" width="44" height="44" rx="10" fill="#D1FAE5"/>
+  <text x="827" y="367" font-family="monospace" font-size="15" font-weight="700" fill="#065F46">CM</text>
+  <text x="872" y="358" font-size="15" font-weight="700" fill="#0F172A">Camille Moreau ★</text>
+  <text x="872" y="376" font-size="11.5" fill="#64748B">Directrice Produit · Atelier Veridian SAS</text>
+
+  <!-- Quick Action Buttons -->
+  <rect x="816" y="398" width="106" height="42" rx="7" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="832" y="423" font-size="11" font-weight="600" fill="#334155">✉ Copier Email</text>
+  <rect x="931" y="398" width="106" height="42" rx="7" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="949" y="423" font-size="11" font-weight="600" fill="#334155">☎ Copier Tél.</text>
+  <rect x="1046" y="398" width="106" height="42" rx="7" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="1062" y="423" font-size="11" font-weight="600" fill="#334155">🪪 Fiche vCard</text>
+
+  <line x1="816" y1="454" x2="1152" y2="454" stroke="#E2E8F0"/>
+  <text x="816" y="476" font-size="11" fill="#64748B">Adresse email validée (RFC 5322)</text>
+  <text x="816" y="494" font-family="monospace" font-size="12" font-weight="600" fill="#0F172A">camille.moreau@atelier-veridian.fr</text>
+
+  <text x="816" y="522" font-size="11" fill="#64748B">Téléphone (Affichage &amp; Canonique E.164)</text>
+  <text x="816" y="540" font-family="monospace" font-size="12" fill="#0F172A">+33 6 14 28 39 50 · <tspan fill="#047857" font-weight="600">+33614283950</tspan></text>
+
+  <text x="816" y="568" font-size="11" fill="#64748B">Étiquettes &amp; Notes métier</text>
+  <text x="816" y="586" font-family="monospace" font-size="11.5" fill="#334155">#vip · #contrat-2026 · #paris</text>
+  <rect x="816" y="596" width="336" height="40" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="826" y="620" font-size="11" fill="#475569">Compte stratégique annuel. Réunion de suivi en novembre.</text>
+
+  <!-- Inspector Footer Buttons -->
+  <rect x="816" y="648" width="232" height="32" rx="7" fill="#0F172A"/>
+  <text x="866" y="668" font-size="11.5" font-weight="600" fill="#FFFFFF">Modifier la fiche complète</text>
+  <rect x="1058" y="648" width="94" height="32" rx="7" fill="#FEF2F2" stroke="#FECACA"/>
+  <text x="1078" y="668" font-size="11.5" font-weight="600" fill="#B91C1C">Supprimer</text>
+</svg>

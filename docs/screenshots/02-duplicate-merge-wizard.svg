@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="100%" height="100%" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <rect width="1200" height="620" rx="12" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- Top Header Banner -->
+  <rect x="28" y="24" width="1144" height="68" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="48" y="52" font-size="16" font-weight="700" fill="#0F172A">Centre de Déduplication &amp; Fusion Transactionnelle (2 paires détectées)</text>
+  <text x="48" y="72" font-size="12" fill="#64748B">Détection multi-critères : Email exact · Téléphone normalisé E.164 · Homonymie · Distance de Levenshtein</text>
+
+  <rect x="880" y="40" width="272" height="36" rx="7" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="902" y="62" font-size="12" font-weight="600" fill="#065F46">✨ Tout fusionner automatiquement (2)</text>
+
+  <!-- Left Column: Detected Duplicate Pairs -->
+  <rect x="28" y="110" width="450" height="482" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="48" y="140" font-size="14" font-weight="700" fill="#0F172A">Paires à examiner</text>
+  <text x="48" y="158" font-size="11.5" fill="#64748B">Cliquez sur une paire pour personnaliser la fusion champ par champ</text>
+  <line x1="28" y1="172" x2="478" y2="172" stroke="#E2E8F0"/>
+
+  <!-- Pair 1 (Selected) -->
+  <rect x="29" y="173" width="448" height="108" fill="#F1F5F9"/>
+  <text x="48" y="200" font-size="14" font-weight="700" fill="#0F172A">Thomas Lefèvre</text>
+  <text x="320" y="200" font-family="monospace" font-size="11.5" font-weight="600" fill="#475569">Confiance Haute · 100%</text>
+  <text x="48" y="222" font-family="monospace" font-size="11.5" fill="#334155">t.lefevre@helios-logistics.eu ↔ thomas.lefevre.pro@helios-logistics.eu</text>
+  <text x="48" y="246" font-size="11.5" font-weight="600" fill="#B45309">Téléphone normalisé identique (+33645781233) · Homonyme même société</text>
+  <line x1="28" y1="281" x2="478" y2="281" stroke="#E2E8F0"/>
+
+  <!-- Pair 2 -->
+  <text x="48" y="310" font-size="14" font-weight="700" fill="#0F172A">Antoine Garnier</text>
+  <text x="320" y="310" font-family="monospace" font-size="11.5" font-weight="600" fill="#475569">Confiance Haute · 100%</text>
+  <text x="48" y="332" font-family="monospace" font-size="11.5" fill="#334155">a.garnier@solaris-energie.fr ↔ a.garnier@solaris-energie.fr</text>
+  <text x="48" y="356" font-size="11.5" font-weight="600" fill="#B45309">Email identique (a.garnier@solaris-energie.fr) · Homonyme Prénom + Nom</text>
+  <line x1="28" y1="382" x2="478" y2="382" stroke="#E2E8F0"/>
+
+  <!-- Right Column: Side-by-Side Merge Comparator -->
+  <rect x="498" y="110" width="674" height="482" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="522" y="140" font-size="15" font-weight="700" fill="#0F172A">Comparateur &amp; Sélection des champs à conserver</text>
+  <text x="522" y="158" font-size="11.5" fill="#64748B">Cliquez sur la cellule de gauche (Fiche A) ou de droite (Fiche B) pour choisir la valeur gagnante.</text>
+
+  <rect x="920" y="124" width="230" height="36" rx="7" fill="#0F172A"/>
+  <text x="942" y="146" font-size="12" font-weight="600" fill="#FFFFFF">⇄ Valider et Fusionner ces 2 fiches</text>
+  <line x1="498" y1="172" x2="1172" y2="172" stroke="#E2E8F0"/>
+
+  <!-- Comparator Table Headers -->
+  <text x="522" y="200" font-size="11.5" font-weight="600" fill="#64748B">Attribut</text>
+  <text x="640" y="200" font-size="11.5" font-weight="600" fill="#64748B">Fiche A (Conservée)</text>
+  <text x="905" y="200" font-size="11.5" font-weight="600" fill="#64748B">Fiche B (Absorbée)</text>
+  <line x1="522" y1="210" x2="1148" y2="210" stroke="#E2E8F0"/>
+
+  <!-- Row 1: Nom -->
+  <text x="522" y="242" font-size="12" font-weight="600" fill="#334155">Nom complet</text>
+  <rect x="640" y="222" width="245" height="32" rx="6" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"/>
+  <text x="652" y="242" font-size="12" font-weight="600" fill="#0F172A">Thomas Lefèvre                 ✓</text>
+  <rect x="905" y="222" width="243" height="32" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="917" y="242" font-size="12" fill="#64748B">Thomas Lefevre</text>
+
+  <!-- Row 2: Email -->
+  <text x="522" y="290" font-size="12" font-weight="600" fill="#334155">Email</text>
+  <rect x="640" y="270" width="245" height="32" rx="6" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"/>
+  <text x="652" y="290" font-family="monospace" font-size="11" font-weight="600" fill="#0F172A">t.lefevre@helios-logistics.eu ✓</text>
+  <rect x="905" y="270" width="243" height="32" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="917" y="290" font-family="monospace" font-size="11" fill="#64748B">thomas.lefevre.pro@helios...</text>
+
+  <!-- Row 3: Phone -->
+  <text x="522" y="338" font-size="12" font-weight="600" fill="#334155">Téléphone</text>
+  <rect x="640" y="318" width="245" height="32" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="652" y="338" font-family="monospace" font-size="11.5" fill="#64748B">06 45 78 12 33</text>
+  <rect x="905" y="318" width="243" height="32" rx="6" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"/>
+  <text x="917" y="338" font-family="monospace" font-size="11.5" font-weight="600" fill="#0F172A">+33 6 45 78 12 33             ✓</text>
+
+  <!-- Row 4: Poste -->
+  <text x="522" y="386" font-size="12" font-weight="600" fill="#334155">Poste</text>
+  <rect x="640" y="366" width="245" height="32" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="652" y="386" font-size="12" fill="#64748B">Responsable Achats</text>
+  <rect x="905" y="366" width="243" height="32" rx="6" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"/>
+  <text x="917" y="386" font-size="12" font-weight="600" fill="#0F172A">Directeur des Achats Groupe ✓</text>
+
+  <!-- Live Merged Result Preview -->
+  <line x1="522" y1="420" x2="1148" y2="420" stroke="#E2E8F0"/>
+  <rect x="522" y="436" width="626" height="132" rx="8" fill="#F8FAFC" stroke="#CBD5E1"/>
+  <text x="542" y="462" font-size="12.5" font-weight="700" fill="#0F172A">Aperçu en direct de la fiche unique après fusion ACID :</text>
+  <text x="542" y="486" font-size="12.5" font-weight="600" fill="#0F172A">Thomas Lefèvre · <tspan font-family="monospace">t.lefevre@helios-logistics.eu</tspan> · <tspan font-family="monospace">+33 6 45 78 12 33</tspan></text>
+  <text x="542" y="510" font-size="12" fill="#334155">Poste retenu : Directeur des Achats Groupe · Helios Logistics Europe (Lyon)</text>
+  <text x="542" y="534" font-family="monospace" font-size="11.5" fill="#047857">Étiquettes unifiées : #logistique · #europe · #sla-or · #prioritaire · #renouvellement</text>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="100%" height="100%" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <rect width="1200" height="640" rx="12" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- Top Row Cards: Export & Reliable Backup -->
+  <rect x="28" y="24" width="560" height="165" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="48" y="52" font-size="15" font-weight="700" fill="#0F172A">Exportation multi-formats (CSV &amp; JSON)</text>
+  <text x="48" y="72" font-size="11.5" fill="#64748B">Conforme RFC 4180 (UTF-8 avec BOM Excel, protection anti-injection = + - @)</text>
+  <line x1="48" y1="88" x2="568" y2="88" stroke="#E2E8F0"/>
+  <text x="48" y="112" font-size="12" fill="#475569">Répertoire complet enregistré : <tspan font-family="monospace" font-weight="700" fill="#0F172A">10 contacts</tspan></text>
+  <rect x="48" y="132" width="190" height="34" rx="7" fill="#0F172A"/>
+  <text x="66" y="153" font-size="11.5" font-weight="600" fill="#FFFFFF">⬇ Exporter &amp; Voir CSV (10)</text>
+  <rect x="250" y="132" width="195" height="34" rx="7" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="268" y="153" font-size="11.5" font-weight="600" fill="#0F172A">⬇ Exporter &amp; Voir JSON (10)</text>
+
+  <rect x="612" y="24" width="560" height="165" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="632" y="52" font-size="15" font-weight="700" fill="#0F172A">Sauvegarde fiable &amp; Intégrité ACID</text>
+  <text x="632" y="72" font-size="11.5" fill="#64748B">Base SQLite en mode journalisé WAL doublée d'un miroir atomique JSON sur disque.</text>
+  <line x1="632" y1="88" x2="1152" y2="88" stroke="#E2E8F0"/>
+  <text x="632" y="112" font-size="12" fill="#475569">Contrôle PRAGMA integrity_check : <tspan font-family="monospace" font-weight="700" fill="#047857">OK (Vérifié)</tspan></text>
+  <rect x="632" y="132" width="260" height="34" rx="7" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="650" y="153" font-size="11.5" font-weight="600" fill="#0F172A">↻ Vérifier &amp; Synchroniser la sauvegarde</text>
+
+  <!-- Bottom Card: Import & Invalid Rows Report -->
+  <rect x="28" y="208" width="1144" height="408" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="48" y="240" font-size="16" font-weight="700" fill="#0F172A">Importation CSV / JSON avec signalement des lignes invalides</text>
+  <text x="48" y="260" font-size="12" fill="#64748B">Chaque enregistrement est validé côté serveur. Les lignes invalides sont isolées avec leur numéro de ligne exact.</text>
+
+  <!-- Summary Metrics Bar -->
+  <line x1="48" y1="278" x2="1152" y2="278" stroke="#E2E8F0"/>
+  <text x="48" y="304" font-size="13.5" font-weight="700" fill="#0F172A">Rapport d'analyse (Mode Simulation Dry-Run / Exécution)</text>
+  <text x="530" y="304" font-family="monospace" font-size="11.5" font-weight="600" fill="#475569">Total analysé : 4 · Valides : 2 · Créés : 1 · Doublons ignorés : 1 · Rejets invalides : 2</text>
+
+  <!-- Red Alert Box for Invalid Rows -->
+  <rect x="48" y="322" width="1104" height="190" rx="8" fill="#FEF2F2" stroke="#FECACA"/>
+  <text x="68" y="350" font-size="13" font-weight="700" fill="#991B1B">⚠ 2 ligne(s) invalide(s) signalée(s) et rejetée(s)</text>
+  <text x="910" y="350" font-size="12" font-weight="600" fill="#B91C1C" text-decoration="underline">Télécharger le rapport d'erreurs (.json)</text>
+
+  <line x1="68" y1="366" x2="1132" y2="366" stroke="#FECACA"/>
+  <text x="68" y="388" font-size="11.5" font-weight="600" fill="#991B1B">Ligne</text>
+  <text x="180" y="388" font-size="11.5" font-weight="600" fill="#991B1B">Entrée concernée</text>
+  <text x="470" y="388" font-size="11.5" font-weight="600" fill="#991B1B">Anomalies détectées par champ</text>
+
+  <!-- Invalid Row 1 -->
+  <line x1="68" y1="400" x2="1132" y2="400" stroke="#FEE2E2"/>
+  <text x="68" y="426" font-family="monospace" font-size="12" font-weight="700" fill="#7F1D1D">Ligne 3</text>
+  <text x="180" y="426" font-family="monospace" font-size="12" fill="#991B1B">Jean · Dupont · email-invalide-sans-domaine</text>
+  <text x="470" y="426" font-size="12" fill="#7F1D1D">Format d'email invalide ("email-invalide-sans-domaine"). Attendu : exemple@domaine.fr</text>
+
+  <!-- Invalid Row 2 -->
+  <line x1="68" y1="446" x2="1132" y2="446" stroke="#FEE2E2"/>
+  <text x="68" y="472" font-family="monospace" font-size="12" font-weight="700" fill="#7F1D1D">Ligne 4</text>
+  <text x="180" y="472" font-family="monospace" font-size="12" fill="#991B1B">Martin · paul.martin@exemple.fr</text>
+  <text x="470" y="472" font-size="12" fill="#7F1D1D">Le prénom est obligatoire. · Longueur de numéro invalide (5 chiffres dans "12345").</text>
+
+  <!-- Amber Box for Duplicate Warning during Import -->
+  <rect x="48" y="528" width="1104" height="68" rx="8" fill="#FFFBEB" stroke="#FDE68A"/>
+  <text x="68" y="554" font-size="12.5" font-weight="700" fill="#92400E">Doublons détectés lors de l'import (1)</text>
+  <text x="68" y="576" font-family="monospace" font-size="11.5" fill="#B45309">Ligne 5 : Camille Moreau (camille.moreau@atelier-veridian.fr) correspond à la fiche existante [Action : skipped]</text>
+</svg>
