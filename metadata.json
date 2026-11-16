@@ -1,0 +1,6 @@
+{
+  "name": "Veridian Contacts — Gestionnaire de Contacts Professionnel",
+  "description": "Application full-stack de gestion de contacts avec validation stricte email/téléphone, recherche exacte et partielle, filtres multicritères, détection et résolution de doublons, import/export CSV et JSON, et journal d'audit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

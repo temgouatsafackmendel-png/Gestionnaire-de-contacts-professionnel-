@@ -1,0 +1,26 @@
+services:
+  veridian-contacts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veridian-contacts
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_PATH=/app/data/contacts.sqlite
+      - JSON_BACKUP_PATH=/app/data/contacts.backup.json
+      - RATE_LIMIT_MAX_REQUESTS=180
+      - DEFAULT_ROLE=admin
+    volumes:
+      - contacts_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  contacts_data:
